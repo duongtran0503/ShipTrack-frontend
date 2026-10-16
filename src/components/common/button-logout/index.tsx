@@ -1,4 +1,3 @@
-// src/components/common/button-logout.tsx
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router';
 

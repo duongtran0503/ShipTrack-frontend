@@ -16,6 +16,8 @@ export const privateRoutes: RouteObject[] = [
             </div>
         ),
     },
+
+
     {
         path: "/profile",
         element: (

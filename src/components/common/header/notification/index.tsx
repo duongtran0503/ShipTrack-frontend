@@ -37,7 +37,7 @@ export default function ButtonNotification() {
 
             </HoverCardTrigger>
 
-            <HoverCardContent align='end' className='w-96 relative h-auto h-fit rounded-md shadow-lg'>
+            <HoverCardContent align='end' className='w-96 relative h-auto rounded-md shadow-lg'>
                 {/* Mũi tên nhỏ */}
                 <div className='absolute -top-0.5 right-4 pointer-events-none'>
                     <div className='w-5 h-5 bg-white rotate-45 border-t border-l border-slate-100' />
