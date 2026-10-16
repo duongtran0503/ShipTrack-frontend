@@ -24,7 +24,7 @@ export const PublicRouteWrapper = ({
             if (mockTokenValid) {
                 setIsAuthenticated(true);
             } else {
-                setIsAuthenticated(false);
+                setIsAuthenticated(true);
             }
         };
 
