@@ -1,6 +1,6 @@
 export default function HeroBackground({ children }: { children?: React.ReactNode }) {
     return (
-        <section className="relative overflow-hidden bg-background">
+        <section className="relative overflow-x-hidden overflow-y-auto bg-background">
             {/* Lớp Background FX */}
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                 {/* Blob 1: Hồng đào nhạt (Trên trái) */}

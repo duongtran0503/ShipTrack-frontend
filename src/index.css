@@ -241,3 +241,80 @@
 .animate-gradient-x {
     animation: gradient-x 2s linear infinite;
 }
+
+/* Hiệu ứng chuyển màu cho Logo */
+@keyframes shiptrack-gradient-x {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+.animate-shiptrack-text {
+    background-image: var(--custom-shiptrack-btn-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shiptrack-gradient-x 3s linear infinite;
+}
+
+/* ============================================================
+   1. HIỆU ỨNG GRADIENT CHẠY (Dùng cho Button nổi bật / Logo)
+   ============================================================ */
+@keyframes gradient-run {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-btn-gradient {
+    /* Sử dụng biến gradient có sẵn của Shiptrack */
+    background-image: var(--custom-shiptrack-btn-gradient);
+    background-size: 200% auto; /* Kéo dãn nền gấp 2 lần để có không gian chạy */
+    animation: gradient-run 2s ease infinite;
+    transition: all 0.3s ease;
+}
+
+/* (Tùy chọn) Khi hover thì chạy nhanh hơn */
+.animate-btn-gradient:hover {
+    animation-duration: 1s;
+    box-shadow: 0 4px 15px rgba(113, 1, 5, 0.3); /* Thêm bóng đổ phát sáng */
+}
+
+/* ============================================================
+   2. HIỆU ỨNG ÁNH SÁNG LƯỚT QUA (Shine Effect - khi Hover)
+   ============================================================ */
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transform: skewX(-25deg);
+    transition: all 0.5s ease;
+}
+
+.btn-shine:hover::after {
+    left: 150%; /* Vệt sáng lướt từ trái sang phải */
+}

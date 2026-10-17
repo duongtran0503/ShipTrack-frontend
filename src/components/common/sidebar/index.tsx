@@ -1,8 +1,8 @@
-import { Truck } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router';
 
 import ButtonLogout from '@/components/common/button-logout';
+import LogoBrand from '@/components/common/logo';
 import { ADMIN_NAV_ITEMS } from '@/components/common/sidebar/nav-content';
 import NavItemWithChildmenu from '@/components/common/sidebar/nav-item-with-children';
 import NavItem from './nav-item';
@@ -42,18 +42,8 @@ export default function AdminSidebar() {
         <div className='w-66 fixed left-0 bottom-0 top-0 bg-background border-r border-border shadow-sm'>
             <div className='flex flex-col h-full justify-between'>
                 {/* Logo */}
-                <div className='p-6 mb-2'>
-                    <div className='flex items-center gap-3'>
-                        {/* Box Icon: dùng màu primary của Shiptrack */}
-                        <div className='w-10 h-10 bg-shiptrack-primary-1 rounded-xl flex items-center justify-center shadow-lg shadow-shiptrack-primary-1/20'>
-                            <Truck className='w-6 h-6 text-primary-foreground' />
-                        </div>
-
-                        {/* Chữ Logo: dùng biến gradient có sẵn thay vì style inline */}
-                        <h1 className='text-2xl font-extrabold tracking-tight bg-clip-text text-transparent animate-gradient-x bg-shiptrack-gradient'>
-                            ShipTrack<span className='text-shiptrack-primary-1'>.</span>
-                        </h1>
-                    </div>
+                <div className='p-2 mt-2 ml-2'>
+                    <LogoBrand />
                 </div>
 
                 {/* Menu */}
