@@ -1,4 +1,3 @@
-// src/features/sidebar/admin-sidebar.tsx
 import { Truck } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router';
@@ -39,29 +38,27 @@ export default function AdminSidebar() {
     }, [fullPath]);
 
     return (
-        <div className='w-66 fixed left-0 bottom-0 top-0 bg-white shadow-shopio-xl'>
+        // Sử dụng bg-background (trắng) hoặc bg-sidebar
+        <div className='w-66 fixed left-0 bottom-0 top-0 bg-background border-r border-border shadow-sm'>
             <div className='flex flex-col h-full justify-between'>
                 {/* Logo */}
                 <div className='p-6 mb-2'>
                     <div className='flex items-center gap-3'>
-                        <div className='w-10 h-10 bg-[#930004] rounded-xl flex items-center justify-center shadow-lg shadow-red-900/20'>
-                            <Truck className='w-6 h-6 text-white' />
+                        {/* Box Icon: dùng màu primary của Shiptrack */}
+                        <div className='w-10 h-10 bg-shiptrack-primary-1 rounded-xl flex items-center justify-center shadow-lg shadow-shiptrack-primary-1/20'>
+                            <Truck className='w-6 h-6 text-primary-foreground' />
                         </div>
-                        <h1 className='text-2xl font-extrabold  
-                        tracking-tight bg-clip-text text-transparent animate-gradient-x
-                        '
-                            style={{
-                                backgroundImage: "linear-gradient(90deg, #930004, #FF3300, #990000)",
-                                backgroundSize: "200% 100%",
-                            }}
-                        >
-                            ShipTrack<span className='text-[#930004]'>.</span>
+
+                        {/* Chữ Logo: dùng biến gradient có sẵn thay vì style inline */}
+                        <h1 className='text-2xl font-extrabold tracking-tight bg-clip-text text-transparent animate-gradient-x bg-shiptrack-gradient'>
+                            ShipTrack<span className='text-shiptrack-primary-1'>.</span>
                         </h1>
                     </div>
                 </div>
 
                 {/* Menu */}
-                <div className='overflow-y-auto h-full px-4 scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-[#930004]/30'>
+                {/* Custom thanh cuộn (scrollbar) dùng màu primary */}
+                <div className='overflow-y-auto h-full px-4 scrollbar-thin scrollbar-thumb-muted hover:scrollbar-thumb-primary/30'>
                     <nav className='flex-1 space-y-1 pb-10'>
                         {ADMIN_NAV_ITEMS.map((item) => {
                             const open = item.listUrl.some((url) =>
@@ -102,7 +99,7 @@ export default function AdminSidebar() {
                 </div>
 
                 {/* Logout */}
-                <div className='p-4 border-t border-gray-50'>
+                <div className='p-4 border-t border-border'>
                     <ButtonLogout />
                 </div>
             </div>

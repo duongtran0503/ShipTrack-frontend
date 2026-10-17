@@ -24,8 +24,10 @@ export default function NavItemWithChildmenu({
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cn(
                     'w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl transition-all duration-200',
-                    'text-slate-700 hover:bg-red-50 hover:text-[#930004]',
-                    isOpen && 'bg-red-50/50 text-[#930004]',
+                    // Text mặc định dùng foreground, hover dùng accent (nền hồng nhạt + chữ đỏ)
+                    'text-foreground hover:bg-accent hover:text-accent-foreground',
+                    // Khi mở: nền accent nhạt hơn và chữ primary
+                    isOpen && 'bg-accent/50 text-primary',
                 )}
                 aria-expanded={isOpen}
             >
@@ -35,8 +37,8 @@ export default function NavItemWithChildmenu({
                         className={cn(
                             'w-5 h-5 shrink-0 transition-colors',
                             isOpen
-                                ? 'text-[#930004]'
-                                : 'text-slate-500 group-hover:text-[#930004]',
+                                ? 'text-primary'
+                                : 'text-muted-foreground group-hover:text-primary',
                         )}
                     />
                     <span className='text-[14px] font-medium truncate whitespace-nowrap'>
@@ -46,9 +48,9 @@ export default function NavItemWithChildmenu({
 
                 <ChevronDown
                     className={cn(
-                        'w-4 h-4 shrink-0 transition-transform duration-300 text-slate-400',
-                        isOpen && 'rotate-180 text-[#930004]',
-                        'group-hover:text-[#930004]',
+                        'w-4 h-4 shrink-0 transition-transform duration-300 text-muted-foreground',
+                        isOpen && 'rotate-180 text-primary',
+                        'group-hover:text-primary',
                     )}
                 />
             </button>
@@ -59,8 +61,8 @@ export default function NavItemWithChildmenu({
                     isOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0',
                 )}
             >
-                {/* Đường line bên trái */}
-                <div className='relative ml-6 pl-4 mt-1 space-y-1 border-l-2 border-slate-100 group-hover:border-red-100 transition-colors'>
+                {/* Đường line bên trái: dùng border-border, hover đổi sang primary */}
+                <div className='relative ml-6 pl-4 mt-1 space-y-1 border-l-2 border-border group-hover:border-shiptrack-soft transition-colors'>
                     {children}
                 </div>
             </div>

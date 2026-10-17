@@ -46,13 +46,15 @@ export default function HeaderContent({ title, description }: Props) {
     );
 
     return (
-        <div className='mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm rounded-xl p-4 bg-white border border-slate-100'>
+        // Nền trắng (bg-card), viền (border-border), đổ bóng nhẹ
+        <div className='mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm rounded-xl p-4 bg-card border border-border'>
             {/* Bên trái: Tiêu đề */}
             <div className='space-y-1'>
-                <h4 className='text-xl md:text-xl font-bold text-slate-900'>
+                <h4 className='text-xl md:text-xl font-bold text-foreground'>
                     {title}
                 </h4>
-                <p className='text-sm text-slate-900 max-w-md line-clamp-1'>
+                {/* Description dùng text phụ (subtitle) */}
+                <p className='text-sm text-muted-foreground max-w-md line-clamp-1'>
                     {description}
                 </p>
             </div>
@@ -64,17 +66,20 @@ export default function HeaderContent({ title, description }: Props) {
                     onClick={() => setOpen(true)}
                     className='relative hidden lg:block cursor-pointer group'
                 >
-                    <Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-800 group-hover:text-[#930004] transition-colors' />
-                    <div className='h-10 w-80 rounded-full bg-slate-50 border border-slate-400 pl-10 pr-4 flex items-center justify-between text-sm text-slate-800 hover:border-[#930004]/30 transition-all'>
-                        <span>Tìm chức năng...</span>
-                        <kbd className='pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-white px-1.5 font-mono text-[10px] font-medium text-slate-500 opacity-100'>
+                    {/* Icon search: đổi màu khi hover */}
+                    <Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-hover:text-primary transition-colors' />
+
+                    {/* Khung Search: nền xám nhạt (muted), viền nhẹ, hover viền đỏ */}
+                    <div className='h-10 w-80 rounded-full bg-muted/50 border border-border pl-10 pr-4 flex items-center justify-between text-sm text-foreground group-hover:border-primary/30 group-hover:bg-background transition-all'>
+                        <span className='text-muted-foreground'>Tìm chức năng...</span>
+                        <kbd className='pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100'>
                             <span className='text-xs'>⌘</span>K
                         </kbd>
                     </div>
                 </div>
 
-                {/* Nút Notify */}
-                <div className='relative cursor-pointer p-2 hover:bg-slate-50 rounded-full transition-colors'>
+                {/* Nút Notify: hover nền accent */}
+                <div className='relative cursor-pointer p-2 hover:bg-accent rounded-full transition-colors'>
                     <ButtonNotification />
                 </div>
 
@@ -85,8 +90,6 @@ export default function HeaderContent({ title, description }: Props) {
             {/* Command Palette Dialog */}
             <CommandDialog open={open} onOpenChange={setOpen}>
                 <Command>
-
-
                     <CommandInput placeholder='Tìm kiếm nhanh chức năng quản trị...' />
                     <CommandList>
                         <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
@@ -96,7 +99,7 @@ export default function HeaderContent({ title, description }: Props) {
                                     {/* Chức năng cha */}
                                     <CommandItem
                                         onSelect={() => runCommand(() => navigate(item.href))}
-                                        className='cursor-pointer'
+                                        className='cursor-pointer data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground'
                                     >
                                         <item.icon className='mr-2 h-4 w-4' />
                                         <span>{item.label}</span>
@@ -107,11 +110,12 @@ export default function HeaderContent({ title, description }: Props) {
                                         <CommandItem
                                             key={child.href}
                                             onSelect={() => runCommand(() => navigate(child.href))}
-                                            className='cursor-pointer pl-8'
+                                            className='cursor-pointer pl-8 data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground'
                                         >
-                                            <div className='mr-2 h-1 w-1 rounded-full bg-slate-400' />
+                                            {/* Chấm tròn nhỏ (bullet) */}
+                                            <div className='mr-2 h-1 w-1 rounded-full bg-muted-foreground' />
                                             <span>{child.label}</span>
-                                            <span className='ml-auto text-[10px] text-slate-400 italic'>
+                                            <span className='ml-auto text-[10px] text-muted-foreground italic'>
                                                 trong {item.label}
                                             </span>
                                         </CommandItem>

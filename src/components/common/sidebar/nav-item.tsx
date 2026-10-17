@@ -21,8 +21,10 @@ export default function NavItem({
             className={cn(
                 'flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group cursor-pointer mb-0.5',
                 active
-                    ? 'bg-[#bc4145] text-white shadow-lg shadow-red-900/20'
-                    : 'text-slate-700 hover:bg-red-50 hover:text-[#930004]',
+                    ? // Khi Active: Dùng nền Gradient đỏ (hoặc bg-primary)
+                    'bg-shiptrack-gradient text-primary-foreground shadow-md shadow-shiptrack-primary-1/20'
+                    : // Khi bình thường: Chữ màu text chính, hover nền hồng nhạt
+                    'text-foreground hover:bg-accent hover:text-accent-foreground',
             )}
         >
             {Icon && (
@@ -30,8 +32,8 @@ export default function NavItem({
                     className={cn(
                         'w-5 h-5 shrink-0 transition-colors',
                         active
-                            ? 'text-white'
-                            : 'text-slate-500 group-hover:text-[#930004]',
+                            ? 'text-primary-foreground' // Icon trắng khi active
+                            : 'text-muted-foreground group-hover:text-primary', // Icon xám, hover thành đỏ
                     )}
                 />
             )}
