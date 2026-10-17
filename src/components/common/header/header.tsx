@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 
 import ButtonNotification from '@/components/common/header/notification';
 import UserInfo from '@/components/common/header/user-info';
-import { ADMIN_NAV_ITEMS } from '@/components/common/sidebar/nav-content';
+import type { NavItemType } from '@/components/common/sidebar/navigations/type';
 import {
     Command,
     CommandDialog,
@@ -19,9 +19,10 @@ import {
 interface Props {
     title: string;
     description: string;
+    navItems: NavItemType[]
 }
 
-export default function HeaderContent({ title, description }: Props) {
+export default function HeaderContent({ title, description, navItems }: Props) {
     const [open, setOpen] = React.useState(false);
     const navigate = useNavigate();
 
@@ -94,11 +95,18 @@ export default function HeaderContent({ title, description }: Props) {
                     <CommandList>
                         <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
                         <CommandGroup heading='Chức năng Dashboard'>
-                            {ADMIN_NAV_ITEMS.map((item) => (
+                            {navItems.map((item) => (
                                 <React.Fragment key={item.id}>
                                     {/* Chức năng cha */}
                                     <CommandItem
-                                        onSelect={() => runCommand(() => navigate(item.href))}
+                                        onSelect={() => runCommand(() => {
+                                            navigate(item.href, {
+
+
+
+                                            })
+
+                                        })}
                                         className='cursor-pointer data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground'
                                     >
                                         <item.icon className='mr-2 h-4 w-4' />

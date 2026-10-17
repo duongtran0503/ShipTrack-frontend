@@ -1,6 +1,4 @@
-// src/features/sidebar/nav-utils.ts
 
-// URL gốc cần match chính xác (không match prefix)
 const ROOT_URLS = new Set<string>(['/dashboard']);
 
 export function normalizePath(p: string): string {

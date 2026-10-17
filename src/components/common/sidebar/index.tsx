@@ -3,18 +3,21 @@ import { useLocation } from 'react-router';
 
 import ButtonLogout from '@/components/common/button-logout';
 import LogoBrand from '@/components/common/logo';
-import { ADMIN_NAV_ITEMS } from '@/components/common/sidebar/nav-content';
 import NavItemWithChildmenu from '@/components/common/sidebar/nav-item-with-children';
+import type { NavItemType } from '@/components/common/sidebar/navigations/type';
 import NavItem from './nav-item';
 import { isNavActive } from './nav-utils';
-
-export default function AdminSidebar() {
+interface Props {
+    contentNav: NavItemType[]
+}
+export default function Sidebar(props: Props) {
     const { pathname, search } = useLocation();
 
-    // Ghép pathname + query string — tương đương usePathname + useSearchParams của Next
+
     const fullPath = useMemo(() => {
         return search ? `${pathname}${search}` : pathname;
     }, [pathname, search]);
+
 
     /**
      * Tìm href cụ thể nhất đang active
@@ -22,7 +25,7 @@ export default function AdminSidebar() {
      */
     const bestMatchHref = useMemo(() => {
         const candidates: string[] = [];
-        for (const item of ADMIN_NAV_ITEMS) {
+        for (const item of props.contentNav) {
             candidates.push(item.href);
             item.children?.forEach((c) => candidates.push(c.href));
         }
@@ -35,7 +38,7 @@ export default function AdminSidebar() {
                         b.split(/[?#]/)[0].length - a.split(/[?#]/)[0].length,
                 )[0] ?? null
         );
-    }, [fullPath]);
+    }, [fullPath, props.contentNav]);
 
     return (
         // Sử dụng bg-background (trắng) hoặc bg-sidebar
@@ -50,7 +53,7 @@ export default function AdminSidebar() {
                 {/* Custom thanh cuộn (scrollbar) dùng màu primary */}
                 <div className='overflow-y-auto h-full px-4 scrollbar-thin scrollbar-thumb-muted hover:scrollbar-thumb-primary/30'>
                     <nav className='flex-1 space-y-1 pb-10'>
-                        {ADMIN_NAV_ITEMS.map((item) => {
+                        {props.contentNav.map((item) => {
                             const open = item.listUrl.some((url) =>
                                 isNavActive(fullPath, url),
                             );

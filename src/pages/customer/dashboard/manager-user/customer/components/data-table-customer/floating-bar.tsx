@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import type { UserType } from "@/pages/dashboard/manager-user/customer/components/data-table-customer/type"
+import type { UserType } from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/type"
 import type { Table } from "@tanstack/react-table"
 import { CircleX, Trash2 } from "lucide-react"
 

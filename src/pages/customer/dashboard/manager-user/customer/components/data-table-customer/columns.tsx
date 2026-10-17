@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { UserType } from "@/pages/dashboard/manager-user/customer/components/data-table-customer/type"
+import type { UserType } from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/type"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import type { ColumnDef, Row } from "@tanstack/react-table"
 import { Eye, Pencil, Trash2 } from "lucide-react"

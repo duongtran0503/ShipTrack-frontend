@@ -1,4 +1,4 @@
-import { type UserType, MOCK_USERS } from "@/pages/dashboard/manager-user/customer/components/data-table-customer/type"
+import { type UserType, MOCK_USERS } from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/type"
 import { useMemo } from "react"
 import { useSearchParams } from "react-router"
 

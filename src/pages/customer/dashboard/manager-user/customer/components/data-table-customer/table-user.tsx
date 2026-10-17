@@ -5,9 +5,9 @@ import DataTableInputSearch from "@/components/common/data-table/data-table-inpu
 import { TableInstanceProvider } from "@/components/common/data-table/table-instance-provider"
 import { Button } from "@/components/ui/button"
 import { useDataTable } from "@/lib/hooks/use-data-table"
-import { getColumns } from "@/pages/dashboard/manager-user/customer/components/data-table-customer/columns"
-import DataTableFloatingBar from "@/pages/dashboard/manager-user/customer/components/data-table-customer/floating-bar"
-import type { UserType } from "@/pages/dashboard/manager-user/customer/components/data-table-customer/type"
+import { getColumns } from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/columns"
+import DataTableFloatingBar from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/floating-bar"
+import type { UserType } from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/type"
 import { Plus } from "lucide-react"
 
 interface Props {

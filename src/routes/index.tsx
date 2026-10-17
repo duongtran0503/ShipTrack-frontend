@@ -1,9 +1,8 @@
-import LayoutDashboard from "@/routes/layout";
 import NotFound from "@/routes/page-not-found";
-import { privateRoutes } from "@/routes/private-router";
+import { privateRoutes } from "@/routes/private.routes";
 import { PrivateRouteWrapper } from "@/routes/PrivateRouteWrapper";
-import { publicRoutes } from "@/routes/public-router";
 import { PublicRouteWrapper } from "@/routes/public-router-wrapper";
+import { publicRoutes } from "@/routes/public.routes";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -15,9 +14,7 @@ const router = createBrowserRouter([
 
     // 2. Các Route Private được bọc bởi PrivateRouteWrapper
     {
-        element: <LayoutDashboard>
-            <PrivateRouteWrapper />
-        </LayoutDashboard>,
+        element: <PrivateRouteWrapper />,
         children: privateRoutes,
     },
 
