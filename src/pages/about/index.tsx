@@ -69,7 +69,7 @@ export default function AboutPage() {
                             <Search className="size-4" /> Tra cứu đơn
                         </a>
                         <button
-                            onClick={() => navigate("/dashboard")}
+                            onClick={() => navigate("/login")}
                             className="rounded-full bg-(image:--background-image-shiptrack-gradient) px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 
                              animate-btn-gradient
                             transition-transform hover:-translate-y-0.5"

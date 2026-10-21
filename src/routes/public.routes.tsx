@@ -1,5 +1,8 @@
 import AboutPage from "@/pages/about";
+import ForgotPasswordPage from "@/pages/forgot-password";
 import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
+import ResetPasswordForm from "@/pages/reset-password/components/reset-password-form";
 import type { RouteObject } from "react-router-dom";
 
 export const publicRoutes: RouteObject[] = [
@@ -10,6 +13,18 @@ export const publicRoutes: RouteObject[] = [
     {
         path: "/login",
         element: <LoginPage />,
+    },
+    {
+        path: "/register",
+        element: <RegisterPage />,
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPasswordPage />,
+    },
+    {
+        path: "/reset-password",
+        element: <ResetPasswordForm />,
     },
     {
         path: "/unauthorized",

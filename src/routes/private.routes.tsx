@@ -1,6 +1,7 @@
 import SuperAdminlayout from "@/components/layout/admin-layout";
 import CustomerLayout from "@/components/layout/customer-layout";
 import DriverLayout from "@/components/layout/driver-layout";
+import ProfilePage from "@/pages/profile";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import type { RouteObject } from "react-router";
 import { adminRoutes } from "./admin.routes";
@@ -34,6 +35,16 @@ export const privateRoutes: RouteObject[] = [
                     <ProtectedRoute allowedRoles={["CUSTOMER", "SUPER_ADMIN"]} />
                 </CustomerLayout>,
                 children: customerRoutes,
+            },
+
+            {
+                element: <ProtectedRoute allowedRoles={["SUPER_ADMIN", "DRIVER", "CUSTOMER"]} />,
+                children: [
+                    {
+                        path: "/profile",
+                        element: <ProfilePage />,
+                    },
+                ],
             },
         ],
     },

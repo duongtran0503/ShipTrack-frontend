@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/config/axios";
+import { mockAuthService } from "@/demo_data_services/mockAuthService"; // Hoặc import từ apiFetch nếu ghép backend sau này
 import { loginSchema, type LoginShemaType } from "@/lib/schemas/auth/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -25,29 +25,40 @@ export const useLoginForm = () => {
 
     const loginMutation = useMutation({
         mutationFn: async (credentials: LoginShemaType) => {
-            const response = await apiFetch.post("/auth/login", credentials);
-            return response.data;
+            // Tạm thời gọi từ Mock Service (khi có Backend thật chỉ cần đổi lại dùng apiFetch)
+            return await mockAuthService.login(credentials.email);
         },
         onSuccess: (data) => {
-            console.log(data)
-            toast.success("Đăng nhập thành công!");
+            toast.success(`Xin chào ${data.username}! Đăng nhập thành công.`);
 
-
+            // Lưu Tokens & Role vào localStorage
             localStorage.setItem("token", data.accessToken);
             localStorage.setItem("refresh-token", data.refreshToken);
+            localStorage.setItem("role", data.role);
 
-
-            navigate("/dashboard");
+            // Phân quyền điều hướng theo Role
+            switch (data.role) {
+                case "SUPER_ADMIN":
+                    navigate("/manager/dashboard");
+                    break;
+                case "DRIVER":
+                    navigate("/driver/dashboard");
+                    break;
+                case "CUSTOMER":
+                    navigate("/customer/dashboard");
+                    break;
+                default:
+                    navigate("/");
+                    break;
+            }
         },
         onError: (error: unknown) => {
-
-            const erroRes = error as { message?: string }
-            toast.error(erroRes.message || "Xảy ra lõi khi đăng nhập")
+            const erroRes = error as { message?: string };
+            toast.error(erroRes.message || "Xảy ra lỗi khi đăng nhập");
         },
     });
 
     const onSubmit = (data: LoginShemaType) => {
-        console.log("data:", data)
         loginMutation.mutate(data);
     };
 

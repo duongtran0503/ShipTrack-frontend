@@ -1,19 +1,10 @@
-import { apiFetch } from "@/lib/config/axios";
+import HeroBackground from "@/components/common/hero-background";
 import { LoginForm } from "@/pages/login/components/login-form";
-import { useQuery } from "@tanstack/react-query";
 
 export default function LoginPage() {
-    const { data } = useQuery({
-        queryFn: () => {
-            return apiFetch.get("");
-        },
-        queryKey: ["test"],
 
 
-    })
-    console.log(data)
-
-    return <div>
+    return <HeroBackground>
         <LoginForm />
-    </div>
+    </HeroBackground>
 }
