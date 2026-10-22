@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button"
-import type { UserType } from "@/pages/manager/dashboard/manager-user/customer/components/data-table-customer/type"
+import type { CustomerOrderType } from "@/pages/customer/order/manager/components/data-table-orders/type"
 import type { Table } from "@tanstack/react-table"
 import { CircleX, Trash2 } from "lucide-react"
 
+
 interface Props {
-    table: Table<UserType>
+    table: Table<CustomerOrderType>
 }
 
 export default function DataTableFloatingBar({ table }: Props) {
@@ -32,7 +33,7 @@ export default function DataTableFloatingBar({ table }: Props) {
                         const ids = table
                             .getFilteredSelectedRowModel()
                             .rows.map((r) => r.original.id)
-                        console.log("Selected IDs:", ids)
+                        console.log("View IDs:", ids)
                     }}
                 >
                     Xem chi tiết
@@ -44,11 +45,11 @@ export default function DataTableFloatingBar({ table }: Props) {
                         const ids = table
                             .getFilteredSelectedRowModel()
                             .rows.map((r) => r.original.id)
-                        console.log("Delete IDs:", ids)
+                        console.log("Cancel IDs:", ids)
                     }}
                 >
                     <Trash2 className="mr-1 size-4" />
-                    Xóa {selectedCount} user
+                    Hủy {selectedCount} đơn
                 </Button>
             </div>
         </div>

@@ -42,7 +42,7 @@ export default function Sidebar(props: Props) {
 
     return (
         // Sử dụng bg-background (trắng) hoặc bg-sidebar
-        <div className='w-66 fixed left-0 bottom-0 top-0 bg-background border-r border-border shadow-sm'>
+        <div className='w-66 fixed left-0 bottom-0 top-0 bg-transparent border-r border-gray-50 shadow-sm'>
             <div className='flex flex-col h-full justify-between'>
                 {/* Logo */}
                 <div className='p-2 mt-2 ml-2'>

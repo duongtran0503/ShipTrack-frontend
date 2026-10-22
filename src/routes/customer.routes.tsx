@@ -2,6 +2,11 @@
 import { Navigate, type RouteObject } from "react-router"
 
 import CustomerDashboard from "@/pages/customer/dashboard"
+import AddressManagementPage from "@/pages/customer/manager-address"
+import CreateOrderPage from "@/pages/customer/order/create"
+import OrderDetailPage from "@/pages/customer/order/detail"
+import CustomerOrdersPage from "@/pages/customer/order/manager"
+import OrderTrackingPage from "@/pages/customer/order/order-tracking"
 import UnderDevelopment from "@/routes/UnderDevelopment"
 
 export const customerRoutes: RouteObject[] = [
@@ -42,10 +47,7 @@ export const customerRoutes: RouteObject[] = [
             {
                 path: "addresses",
                 element: (
-                    <UnderDevelopment
-                        title="Địa chỉ của tôi"
-                        description="Danh sách địa chỉ đã lưu (nhà, công ty...), đặt địa chỉ mặc định cho lấy/giao hàng và quản lý nhãn địa chỉ."
-                    />
+                    <AddressManagementPage />
                 ),
             },
             {
@@ -71,10 +73,7 @@ export const customerRoutes: RouteObject[] = [
             {
                 path: "orders/create",
                 element: (
-                    <UnderDevelopment
-                        title="Tạo đơn hàng mới"
-                        description="Chọn địa chỉ lấy/giao, nhập thông tin hàng hóa, xem phí vận chuyển dự kiến và xác nhận tạo đơn."
-                    />
+                    <CreateOrderPage />
                 ),
             },
 
@@ -82,11 +81,12 @@ export const customerRoutes: RouteObject[] = [
             {
                 path: "orders",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn hàng của tôi"
-                        description="Danh sách toàn bộ đơn hàng đã tạo, lọc theo trạng thái và ngày tạo. Xem chi tiết, hủy đơn và tải hóa đơn."
-                    />
+                    <CustomerOrdersPage />
                 ),
+            },
+            {
+                path: "orders/:id",
+                element: <OrderDetailPage />,
             },
             {
                 path: "orders/pending",
@@ -124,22 +124,11 @@ export const customerRoutes: RouteObject[] = [
                     />
                 ),
             },
-            {
-                path: "orders/:id",
-                element: (
-                    <UnderDevelopment
-                        title="Chi tiết đơn hàng"
-                        description="Thông tin đầy đủ của đơn: trạng thái, tài xế phụ trách, phí vận chuyển, thời gian và lịch sử thay đổi trạng thái."
-                    />
-                ),
-            },
+
             {
                 path: "orders/:id/tracking",
                 element: (
-                    <UnderDevelopment
-                        title="Theo dõi đơn hàng"
-                        description="Bản đồ real-time qua SignalR: vị trí tài xế, lộ trình giao hàng và thời gian dự kiến tài xế đến."
-                    />
+                    <OrderTrackingPage />
                 ),
             },
             {

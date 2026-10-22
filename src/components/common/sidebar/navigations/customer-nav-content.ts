@@ -40,7 +40,7 @@ export const CUSTOMER_NAV_ITEMS: NavItemType[] = [
     // ==================== NHÓM 2: QUẢN LÝ ĐỊA CHỈ ====================
     {
         id: "addresses",
-        label: "Địa chỉ của tôi",
+        label: "Quản lý địa chỉ",
         icon: MapPin,
         href: "/customer/addresses",
         listUrl: [
