@@ -13,9 +13,9 @@ export const registerSchema = z
         role: z.enum(["CUSTOMER", "DRIVER"]),
 
 
-        licenseNumber: z.string(),
-        vehicleType: z.string(),
-        licensePlate: z.string(),
+     licenseNumber: z.string().optional(),
+        vehicleType: z.string().optional(),
+        licensePlate: z.string().optional(),
 
 
         acceptTerms: z.literal(true, {
@@ -36,7 +36,7 @@ export const registerSchema = z
         // 2. Validate bắt buộc nhập thông tin Driver khi role = "DRIVER"
         if (data.role === "DRIVER") {
             // Đã thêm Check an toàn (?.) trước khi dùng .trim() phòng hờ dữ liệu undefined
-            if (!data.licenseNumber.trim() || data.licenseNumber.trim().length < 5) {
+            if (!data.licenseNumber?.trim() || data.licenseNumber.trim().length < 5) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "Số bằng lái xe không được để trống và phải có ít nhất 5 ký tự",

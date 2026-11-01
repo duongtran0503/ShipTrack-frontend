@@ -16,7 +16,7 @@ interface Props {
     isCancelDialogOpen: boolean
     setIsCancelDialogOpen: (open: boolean) => void
     cancelReason: string
-    setCancelReason: (v: string | null) => void
+    setCancelReason: (v: string ) => void
     cancelNote: string
     setCancelNote: (v: string) => void
     isCancelling: boolean

@@ -1,11 +1,18 @@
-import { mockAuthService } from "@/demo_data_services/mockAuthService"; // Hoặc import từ apiFetch nếu ghép backend sau này
-import { loginSchema, type LoginShemaType } from "@/lib/schemas/auth/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+import { loginSchema, type LoginShemaType } from "@/lib/schemas/auth/login";
+import { authApi } from "@/services/auth/auth-api";
+import type { LoginResponse } from "@/services/auth/type";
+
+const TOKEN_STORAGE_KEY = "accessToken";
+const REFRESH_TOKEN_STORAGE_KEY = "refreshToken";
+const USER_ROLE_STORAGE_KEY = "role";
+const CURRENT_USER_STORAGE_KEY = "shiptrack_current_user";
 
 export const useLoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -23,38 +30,42 @@ export const useLoginForm = () => {
         },
     });
 
+    // Thay thế mockApi bằng authApi.login thật
     const loginMutation = useMutation({
-        mutationFn: async (credentials: LoginShemaType) => {
-            // Tạm thời gọi từ Mock Service (khi có Backend thật chỉ cần đổi lại dùng apiFetch)
-            return await mockAuthService.login(credentials.email);
-        },
-        onSuccess: (data) => {
-            toast.success(`Xin chào ${data.username}! Đăng nhập thành công.`);
+        mutationFn: (credentials: LoginShemaType) => authApi.login(credentials),
+        onSuccess: (data: LoginResponse) => {
+            // 1. Lưu token và thông tin người dùng vào localStorage từ response của API thực tế
+            localStorage.setItem(TOKEN_STORAGE_KEY, data.access_token);
+            localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, data.refresh_token);
+            localStorage.setItem(USER_ROLE_STORAGE_KEY, data.role);
+            localStorage.setItem(
+                CURRENT_USER_STORAGE_KEY,
+                JSON.stringify({
+                    id: String(data.user_id),
+                    fullName: data.name,
+                    email: data.email,
+                    phone: data.phone,
+                    role: data.role.toUpperCase(),
+                    licensePlate: data.license_plate,
+                })
+            );
 
-            // Lưu Tokens & Role vào localStorage
-            localStorage.setItem("token", data.accessToken);
-            localStorage.setItem("refresh-token", data.refreshToken);
-            localStorage.setItem("role", data.role);
+            toast.success(`Đăng nhập thành công! Chào mừng ${data.name}`);
 
-            // Phân quyền điều hướng theo Role
-            switch (data.role) {
-                case "SUPER_ADMIN":
-                    navigate("/manager/dashboard");
-                    break;
-                case "DRIVER":
-                    navigate("/driver/dashboard");
-                    break;
-                case "CUSTOMER":
-                    navigate("/customer/dashboard");
-                    break;
-                default:
-                    navigate("/");
-                    break;
+            // 2. Điều hướng dựa theo role trả về từ backend thực tế
+            if (data.role === "admin") {
+                navigate("/manager/dashboard");
+            } else if (data.role === "driver") {
+                navigate("/driver/dashboard");
+            } else {
+                navigate("/customer/dashboard");
             }
         },
-        onError: (error: unknown) => {
-            const erroRes = error as { message?: string };
-            toast.error(erroRes.message || "Xảy ra lỗi khi đăng nhập");
+        onError: (error: any) => {
+            console.log("ldskjflwsadkfj", error)
+            const errorMessage =
+                "Đăng nhập thất bại. Vui lòng kiểm tra lại!";
+            toast.error(errorMessage);
         },
     });
 
