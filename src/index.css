@@ -319,3 +319,16 @@
 .btn-shine:hover::after {
     left: 150%; /* Vệt sáng lướt từ trái sang phải */
 }
+
+/* Fix lỗi hiển thị bản đồ Leaflet */
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+}
+
+/* Đảm bảo thẻ img bên trong bản đồ không bị CSS global của dự án (như Tailwind) đè bẹp */
+.leaflet-container img {
+    max-width: none !important;
+    max-height: none !important;
+}
