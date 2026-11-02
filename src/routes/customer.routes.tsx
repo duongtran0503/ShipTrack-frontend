@@ -6,7 +6,13 @@ import AddressManagementPage from "@/pages/customer/manager-address"
 import CreateOrderPage from "@/pages/customer/order/create"
 import OrderDetailPage from "@/pages/customer/order/detail"
 import CustomerOrdersPage from "@/pages/customer/order/manager"
+import CancelledOrderPage from "@/pages/customer/order/manager/cancelled"
+import CompletedOrderPage from "@/pages/customer/order/manager/completed"
+import DeliveringOrderPage from "@/pages/customer/order/manager/delivering"
+import WaitingForDiver from "@/pages/customer/order/manager/waiting-for-driver"
 import OrderTrackingPage from "@/pages/customer/order/order-tracking"
+import ProfilePage from "@/pages/customer/profile"
+import ChangePasswordPage from "@/pages/customer/profile/change-password"
 import UnderDevelopment from "@/routes/UnderDevelopment"
 
 export const customerRoutes: RouteObject[] = [
@@ -27,19 +33,13 @@ export const customerRoutes: RouteObject[] = [
             {
                 path: "profile",
                 element: (
-                    <UnderDevelopment
-                        title="Thông tin cá nhân"
-                        description="Xem và cập nhật hồ sơ: họ tên, email, số điện thoại và ảnh đại diện."
-                    />
+                    <ProfilePage />
                 ),
             },
             {
                 path: "profile/change-password",
                 element: (
-                    <UnderDevelopment
-                        title="Đổi mật khẩu"
-                        description="Thay đổi mật khẩu đăng nhập để bảo vệ tài khoản khỏi truy cập trái phép."
-                    />
+                    <ChangePasswordPage />
                 ),
             },
 
@@ -91,37 +91,26 @@ export const customerRoutes: RouteObject[] = [
             {
                 path: "orders/pending",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn chờ tài xế"
-                        description="Các đơn đang ở trạng thái Pending hoặc SearchingDriver, chờ hệ thống điều phối tài xế nhận giao."
-                    />
+                    <WaitingForDiver />
                 ),
             },
             {
                 path: "orders/active",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn đang giao"
-                        description="Theo dõi real-time đơn đang trên đường: vị trí tài xế trên bản đồ, lộ trình và thời gian dự kiến còn lại."
-                    />
+                    <DeliveringOrderPage />
                 ),
             },
             {
                 path: "orders/completed",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn đã hoàn thành"
-                        description="Lịch sử các đơn đã giao thành công, xem hóa đơn và đánh giá tài xế sau khi nhận hàng."
-                    />
+                    <CompletedOrderPage />
                 ),
             },
             {
                 path: "orders/cancelled",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn đã hủy"
-                        description="Danh sách các đơn đã hủy kèm lý do và trạng thái hoàn tiền (nếu có)."
-                    />
+                    <CancelledOrderPage />
+
                 ),
             },
 

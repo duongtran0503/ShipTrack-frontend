@@ -50,12 +50,13 @@ export const useLoginForm = () => {
                 })
             );
 
-            toast.success(`Đăng nhập thành công! Chào mừng ${data.name}`);
 
+            toast.success(`Đăng nhập thành công! Chào mừng ${data.name}`);
+            const checkRole = data.role.toUpperCase()
             // 2. Điều hướng dựa theo role trả về từ backend thực tế
-            if (data.role === "admin") {
+            if (checkRole === "ADMIN") {
                 navigate("/manager/dashboard");
-            } else if (data.role === "driver") {
+            } else if (["DRIVER_EXPRESS", "DRIVER_TRUCK", "DRIVER_CONTAINER"].includes(checkRole)) {
                 navigate("/driver/dashboard");
             } else {
                 navigate("/customer/dashboard");
@@ -63,7 +64,7 @@ export const useLoginForm = () => {
         },
         onError: (error: any) => {
             console.log("ldskjflwsadkfj", error)
-            const errorMessage =
+            const errorMessage = error.message ||
                 "Đăng nhập thất bại. Vui lòng kiểm tra lại!";
             toast.error(errorMessage);
         },
