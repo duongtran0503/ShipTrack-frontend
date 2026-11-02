@@ -1,6 +1,8 @@
 import axios from 'axios';
+
 const apiUrl = import.meta.env.VITE_API_ENDPOINT;
-console.log(apiUrl)
+console.log(apiUrl);
+
 const apiClient = axios.create({
     baseURL: apiUrl,
     headers: {
@@ -8,27 +10,41 @@ const apiClient = axios.create({
     },
 });
 
-apiClient.interceptors.response.use(response => {
-    return response
-}, (error) => {
-    // Kiểm tra xem có phản hồi lỗi từ phía server không
-    if (error.response) {
-        // Server phản hồi với status code nằm ngoài khoảng 2xx
+// ==================== REQUEST INTERCEPTOR ====================
+// Tự động kiểm tra và gắn accessToken vào header trước khi gửi request
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("accessToken");
 
-        // Trả về dữ liệu lỗi của server (hoặc toàn bộ error.response tùy bạn muốn)
-        return Promise.reject(error.response.data);
-    } else if (error.request) {
-        // Request đã được gửi nhưng không nhận được phản hồi từ server (Lỗi mạng, sập server)
-        return Promise.reject({ message: "Không thể kết nối đến server" });
-    } else {
-        // Có lỗi xảy ra khi thiết lập request
-        return Promise.reject({ message: error.message });
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-})
+);
 
-apiClient.interceptors.request.use(config => {
-    return config;
-})
+// ==================== RESPONSE INTERCEPTOR ====================
+apiClient.interceptors.response.use(
+    (response) => {
+        return response.data;
+    },
+    (error) => {
+        // Kiểm tra xem có phản hồi lỗi từ phía server không
+        if (error.response) {
+            // Server phản hồi với status code nằm ngoài khoảng 2xx
+            return Promise.reject(error.response.data);
+        } else if (error.request) {
+            // Request đã được gửi nhưng không nhận được phản hồi từ server (Lỗi mạng, sập server)
+            return Promise.reject({ message: "Không thể kết nối đến server" });
+        } else {
+            // Có lỗi xảy ra khi thiết lập request
+            return Promise.reject({ message: error.message });
+        }
+    }
+);
 
 export { apiClient };
-

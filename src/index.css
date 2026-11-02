@@ -227,6 +227,7 @@
     }
     html {
         @apply font-sans;
+        font-family: 'Inter', sans-serif;
     }
 }
 
