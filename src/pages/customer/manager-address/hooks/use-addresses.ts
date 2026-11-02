@@ -5,13 +5,11 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import {
-    mockAddressService,
-    type CustomerAddress,
-} from "@/demo_data_services/mockAddressService"
-import {
     addressSchema,
     type AddressSchemaType,
 } from "@/lib/schemas/address"
+import { addressApi } from "@/services/user/address-api"
+import type { CustomerAddress } from "@/services/user/type"
 
 const DEFAULT_VALUES: AddressSchemaType = {
     label: "Nhà riêng",
@@ -19,6 +17,8 @@ const DEFAULT_VALUES: AddressSchemaType = {
     contactPhone: "",
     fullAddress: "",
     isDefault: false,
+    lat: 0,
+    lng: 0,
 }
 
 export function useAddresses() {
@@ -33,7 +33,7 @@ export function useAddresses() {
     // ==================== QUERY ====================
     const { data: addresses, isLoading } = useQuery({
         queryKey: ["customer_addresses"],
-        queryFn: mockAddressService.getAddresses,
+        queryFn: addressApi.getAddresses,
     })
 
     // ==================== FORM ====================
@@ -48,9 +48,9 @@ export function useAddresses() {
     const saveMutation = useMutation({
         mutationFn: (data: AddressSchemaType) => {
             if (editingAddress) {
-                return mockAddressService.updateAddress(editingAddress.id, data)
+                return addressApi.updateAddress(editingAddress.id, data)
             }
-            return mockAddressService.addAddress(data)
+            return addressApi.addAddress(data)
         },
         onSuccess: () => {
             toast.success(
@@ -61,30 +61,36 @@ export function useAddresses() {
             queryClient.invalidateQueries({ queryKey: ["customer_addresses"] })
             closeModal()
         },
-        onError: (err: Error) => {
-            toast.error(err.message || "Xảy ra lỗi khi lưu địa chỉ!")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (err: any) => {
+            const errorMessage = err?.response?.data?.message || err?.message || "Xảy ra lỗi khi lưu địa chỉ!"
+            toast.error(errorMessage)
         },
     })
 
     const deleteMutation = useMutation({
-        mutationFn: mockAddressService.deleteAddress,
+        mutationFn: (id: string | number) => addressApi.deleteAddress(id),
         onSuccess: () => {
             toast.success("Đã xóa địa chỉ!")
             queryClient.invalidateQueries({ queryKey: ["customer_addresses"] })
         },
-        onError: (err: Error) => {
-            toast.error(err.message || "Xóa địa chỉ thất bại!")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (err: any) => {
+            const errorMessage = err?.response?.data?.message || err?.message || "Xóa địa chỉ thất bại!"
+            toast.error(errorMessage)
         },
     })
 
     const setDefaultMutation = useMutation({
-        mutationFn: mockAddressService.setDefaultAddress,
+        mutationFn: (addr: CustomerAddress) => addressApi.setDefaultAddress(addr),
         onSuccess: () => {
             toast.success("Đã cập nhật địa chỉ mặc định!")
             queryClient.invalidateQueries({ queryKey: ["customer_addresses"] })
         },
-        onError: (err: Error) => {
-            toast.error(err.message || "Cập nhật mặc định thất bại!")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (err: any) => {
+            const errorMessage = err?.response?.data?.message || err?.message || "Cập nhật mặc định thất bại!"
+            toast.error(errorMessage)
         },
     })
 
@@ -103,6 +109,8 @@ export function useAddresses() {
             contactPhone: addr.contactPhone,
             fullAddress: addr.fullAddress,
             isDefault: addr.isDefault,
+            lat: addr.lat || 0,
+            lng: addr.lng || 0,
         })
         setIsModalOpen(true)
     }
@@ -116,8 +124,10 @@ export function useAddresses() {
         saveMutation.mutate(data)
     })
 
-    const onDelete = (id: string) => deleteMutation.mutate(id)
-    const onSetDefault = (id: string) => setDefaultMutation.mutate(id)
+    const onDelete = (id: string | number) => deleteMutation.mutate(id)
+
+    // Nhận trực tiếp đối tượng CustomerAddress từ UI để gọi API PUT đặt mặc định
+    const onSetDefault = (addr: CustomerAddress) => setDefaultMutation.mutate(addr)
 
     // ==================== RETURN ====================
     return {

@@ -14,7 +14,7 @@ interface Props {
     address: CustomerAddress
     onEdit: (addr: CustomerAddress) => void
     onDelete: (id: string) => void
-    onSetDefault: (id: string) => void
+    onSetDefault: (addr: CustomerAddress) => void
 }
 
 export function AddressCard({
@@ -71,7 +71,7 @@ export function AddressCard({
                 {!address.isDefault ? (
                     <button
                         type="button"
-                        onClick={() => onSetDefault(address.id)}
+                        onClick={() => onSetDefault(address)}
                         className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary font-semibold transition-colors cursor-pointer"
                     >
                         <Star className="size-3.5" />

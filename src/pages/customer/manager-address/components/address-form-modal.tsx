@@ -6,6 +6,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import type { CustomerAddress } from "@/demo_data_services/mockAddressService"
 import type { AddressSchemaType } from "@/lib/schemas/address"
+import { AddressSearchInput } from "@/pages/customer/order/create/components/address-search-input"
 
 const LABEL_PRESETS = ["Nhà riêng", "Công ty", "Kho hàng"]
 
@@ -88,6 +89,32 @@ export function AddressFormModal({
                             </Field>
                         )}
                     />
+                    {/* Địa chỉ chi tiết sử dụng AddressSearchInput kết hợp Vietmap */}
+                    <Controller
+                        name="fullAddress"
+                        control={control}
+                        render={({ field }) => (
+                            <Field data-invalid={!!errors.fullAddress}>
+                                <AddressSearchInput
+                                    label="Địa chỉ chi tiết"
+                                    placeholder="Nhập số nhà, tên đường, khu vực..."
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onSelectLocation={(loc) => {
+                                        // Tự động gán lat và lng vào form khi người dùng chọn một gợi ý địa điểm
+                                        setValue("lat", loc.lat);
+                                        setValue("lng", loc.lng);
+                                    }}
+                                    badgeColor="primary"
+                                />
+                                {errors.fullAddress && (
+                                    <FieldError className="px-1 text-xs text-destructive mt-1">
+                                        {errors.fullAddress.message}
+                                    </FieldError>
+                                )}
+                            </Field>
+                        )}
+                    />
 
                     {/* Tên & Số điện thoại */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -113,6 +140,8 @@ export function AddressFormModal({
                             )}
                         />
 
+
+
                         <Controller
                             name="contactPhone"
                             control={control}
@@ -136,28 +165,6 @@ export function AddressFormModal({
                         />
                     </div>
 
-                    {/* Địa chỉ chi tiết */}
-                    <Controller
-                        name="fullAddress"
-                        control={control}
-                        render={({ field }) => (
-                            <Field data-invalid={!!errors.fullAddress}>
-                                <FieldLabel className="text-xs font-semibold">
-                                    Địa chỉ chi tiết
-                                </FieldLabel>
-                                <Input
-                                    {...field}
-                                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện, TP"
-                                    className="h-11 rounded-xl border-border bg-muted/30 px-4 text-sm"
-                                />
-                                {errors.fullAddress && (
-                                    <FieldError className="px-1 text-xs text-destructive">
-                                        {errors.fullAddress.message}
-                                    </FieldError>
-                                )}
-                            </Field>
-                        )}
-                    />
 
                     {/* Tick Mặc định */}
                     <Controller

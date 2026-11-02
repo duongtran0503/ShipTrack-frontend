@@ -5,6 +5,8 @@ export interface CustomerAddress {
     contactPhone: string;
     fullAddress: string;
     isDefault: boolean;
+    lat: number,
+    lng: number
 }
 
 const ADDRESS_STORAGE_KEY = "shiptrack_customer_addresses";
@@ -21,6 +23,9 @@ const initMockAddresses = (): CustomerAddress[] => {
             contactPhone: "0923456789",
             fullAddress: "123 Nguyễn Thị Minh Khai, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
             isDefault: true,
+            lat: 0,
+            lng: 0,
+
         },
         {
             id: "addr_2",
@@ -29,6 +34,8 @@ const initMockAddresses = (): CustomerAddress[] => {
             contactPhone: "0923456789",
             fullAddress: "789 Điện Biên Phủ, Phường 22, Quận Bình Thạnh, TP. Hồ Chí Minh",
             isDefault: false,
+            lat: 0,
+            lng: 0,
         },
     ];
 

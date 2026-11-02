@@ -7,7 +7,7 @@ interface Props {
     isLoading: boolean
     onEdit: (addr: CustomerAddress) => void
     onDelete: (id: string) => void
-    onSetDefault: (id: string) => void
+    onSetDefault: (addr: CustomerAddress) => void
     onCreate: () => void
 }
 
