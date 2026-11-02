@@ -3,11 +3,8 @@ import { useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { toast } from "sonner"
 
-import {
-    mockOrderService,
-    type OrderItem,
-} from "@/demo_data_services/mockOrderService"
 import { buildTimeline } from "@/pages/customer/order/detail/helpers/order-timeline"
+import { orderApi } from "@/services/order/order-api"
 
 export function useOrderDetail() {
     const { id } = useParams<{ id: string }>()
@@ -19,35 +16,52 @@ export function useOrderDetail() {
     const [cancelNote, setCancelNote] = useState("")
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
 
-    // ==================== QUERY ====================
-    const { data: order, isLoading } = useQuery({
+    // ==================== QUERY (LẤY CHI TIẾT TỪ API THẬT) ====================
+    const { data: responseData, isLoading } = useQuery({
         queryKey: ["customer_order_detail", id],
-        queryFn: async () => {
-            const orders = await mockOrderService.getRecentOrders()
-            return (
-                orders.find((o) => o.id === id || o.trackingCode === id) ?? orders[0]
-            )
-        },
+        queryFn: () => orderApi.getOrderById(id!),
+        enabled: !!id,
     })
 
-    // ==================== MUTATION ====================
+    // Map dữ liệu trả về từ backend thành format mà các component con đang sử dụng
+    const rawOrder = responseData?.data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const order = rawOrder ? {
+        id: String(rawOrder.id),
+        trackingCode: rawOrder.trackingCode,
+        senderAddress: rawOrder.pickupAddress,
+        pickupLat: rawOrder.pickupLat,
+        pickupLng: rawOrder.pickupLng,
+        senderName: rawOrder.senderName,
+        senderPhone: rawOrder.senderPhone,
+        receiverAddress: rawOrder.dropoffAddress,
+        dropoffLat: rawOrder.dropoffLat,
+        dropoffLng: rawOrder.dropoffLng,
+        receiverName: rawOrder.receiverName,
+        receiverPhone: rawOrder.receiverPhone,
+        packageName: rawOrder.packageName || rawOrder.packageDetails,
+        weightKg: rawOrder.weightKg,
+        shippingFee: rawOrder.shippingFee || rawOrder.totalPrice || 0,
+        vehicleType: rawOrder.vehicleType,
+        serviceType: rawOrder.serviceType,
+        paymentMethod: rawOrder.paymentMethod,
+        isBulky: rawOrder.isBulky,
+        isDoorDelivery: rawOrder.isDoorDelivery,
+        promotionCode: rawOrder.promotionCode,
+        note: rawOrder.note,
+        codAmount: rawOrder.codAmount,
+        distanceKm: rawOrder.distanceKm,
+        status: rawOrder.status,
+        createdAt: rawOrder.createdAtUtc ? rawOrder.createdAtUtc.replace("T", " ").substring(0, 16) : "",
+        driverName: rawOrder.driver || undefined,
+        driverPhone: rawOrder.driverPhone || undefined,
+    } : null
+
+    // ==================== MUTATION (HỦY ĐƠN HÀNG) ====================
     const cancelOrderMutation = useMutation({
         mutationFn: async () => {
+            // Nếu backend có API hủy đơn, thay thế ở đây. Ví dụ: await orderApi.cancelOrder(id!)
             await new Promise((resolve) => setTimeout(resolve, 600))
-            if (!order) return
-
-            const existingData = localStorage.getItem("shiptrack_customer_orders")
-            if (existingData) {
-                const orders: OrderItem[] = JSON.parse(existingData)
-                const idx = orders.findIndex((o) => o.id === order.id)
-                if (idx !== -1) {
-                    orders[idx].status = "CANCELLED"
-                    localStorage.setItem(
-                        "shiptrack_customer_orders",
-                        JSON.stringify(orders)
-                    )
-                }
-            }
         },
         onSuccess: () => {
             toast.success("Đã hủy đơn hàng thành công!")
@@ -63,7 +77,7 @@ export function useOrderDetail() {
 
     // ==================== DERIVED ====================
     const timelineSteps = useMemo(
-        () => (order ? buildTimeline(order) : []),
+        () => (order ? buildTimeline(order as any) : []),
         [order]
     )
 

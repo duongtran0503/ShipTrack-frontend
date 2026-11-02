@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Controller, type UseFormReturn } from "react-hook-form"
 
 import { Badge } from "@/components/ui/badge"
@@ -16,9 +17,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import type { CustomerAddress } from "@/demo_data_services/mockAddressService"
+import type { LatLng } from "@/lib/hooks/use-vietmap"
 import type { CreateOrderSchemaType } from "@/lib/schemas/order"
-import { useState } from "react"
+import type { CustomerAddress } from "@/services/user/type"
+import { AddressSearchInput } from "./address-search-input"
 
 type AddressType = "sender" | "receiver"
 
@@ -29,6 +31,7 @@ interface Props {
     form: UseFormReturn<CreateOrderSchemaType>
     addresses?: CustomerAddress[]
     onSelectAddress: (addrId: string) => void
+    userLocation?: LatLng
 }
 
 export function AddressSection({
@@ -38,17 +41,16 @@ export function AddressSection({
     form,
     addresses,
     onSelectAddress,
+    userLocation,
 }: Props) {
-    const [address, setAddress] = useState("")
-    const {
-        control,
-        formState: { errors },
-    } = form
+    const [selectedAddressId, setSelectedAddressId] = useState("")
+    const { control, setValue, formState: { errors } } = form
 
-    // Field names theo type
-    const addressField = `${type}Address` as const
-    const nameField = `${type}Name` as const
-    const phoneField = `${type}Phone` as const
+    const addressField = (type === "sender" ? "senderAddress" : "dropoffAddress")
+    const nameField = (type === "sender" ? "senderName" : "receiverName")
+    const phoneField = (type === "sender" ? "senderPhone" : "receiverPhone")
+    const latField = (type === "sender" ? "pickupLat" : "dropoffLat")
+    const lngField = (type === "sender" ? "pickupLng" : "dropoffLng")
 
     return (
         <Card className="rounded-3xl border-border/60 shadow-md">
@@ -62,14 +64,14 @@ export function AddressSection({
 
                 {addresses && addresses.length > 0 && (
                     <Select
-                        value={address}
+                        value={selectedAddressId}
                         onValueChange={(value) => {
-                            const selectedAddress = addresses.find(address => address.id === value)
-
-                            if (value) onSelectAddress(value)
-                            setAddress(selectedAddress?.fullAddress as string)
-                        }
-                        }>
+                            if (value) {
+                                onSelectAddress(value)
+                                setSelectedAddressId(value)
+                            }
+                        }}
+                    >
                         <SelectTrigger className="w-50 h-8 text-xs rounded-xl bg-muted/40">
                             <SelectValue placeholder="-- Chọn từ sổ địa chỉ --" />
                         </SelectTrigger>
@@ -89,25 +91,37 @@ export function AddressSection({
                     name={addressField}
                     control={control}
                     render={({ field }) => (
-                        <Field data-invalid={!!errors[addressField]}>
-                            <FieldLabel className="text-xs font-semibold">
-                                Địa chỉ chi tiết
-                            </FieldLabel>
-                            <Input
-                                {...field}
+                        <div>
+                            <AddressSearchInput
+                                label="Địa chỉ chi tiết"
                                 placeholder={
                                     type === "sender"
                                         ? "Ví dụ: 456 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.HCM"
                                         : "Ví dụ: 789 Lê Văn Việt, Phường Tăng Nhơn Phú A, TP. Thủ Đức"
                                 }
-                                className="h-11 rounded-xl bg-muted/30"
+                                value={field.value ?? ""}
+                                onChange={(value) => field.onChange(value)}
+                                onSelectLocation={(location) => {
+                                    // 👇 QUAN TRỌNG: Đổi shouldValidate thành true
+                                    // để React Hook Form trigger re-render cho hook useCreateOrder
+                                    setValue(latField, location.lat, {
+                                        shouldValidate: true,
+                                        shouldDirty: true
+                                    })
+                                    setValue(lngField, location.lng, {
+                                        shouldValidate: true,
+                                        shouldDirty: true
+                                    })
+                                }}
+                                badgeColor={type === "sender" ? "primary" : "emerald"}
+                                userLocation={userLocation}
                             />
                             {errors[addressField] && (
-                                <FieldError className="px-1 text-xs text-destructive">
+                                <FieldError className="px-1 text-xs text-destructive mt-1">
                                     {errors[addressField]?.message}
                                 </FieldError>
                             )}
-                        </Field>
+                        </div>
                     )}
                 />
 

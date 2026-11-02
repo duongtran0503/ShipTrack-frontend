@@ -4,14 +4,18 @@ import { OrderFeeSummary } from "@/pages/customer/order/create/components/order-
 import { PackageInfoSection } from "@/pages/customer/order/create/components/package-info-section"
 import { useCreateOrder } from "@/pages/customer/order/create/hooks/use-create-order"
 
-
 export default function CreateOrderPage() {
     const {
         form,
         onSubmit,
         addresses,
+
+        // Data cho tính phí
         weightWatch,
         calculationResult,
+        isCalculating, // 👈 Lấy từ hook
+
+        // Actions
         goBack,
         selectAddressFromBook,
         isCreating,
@@ -19,8 +23,8 @@ export default function CreateOrderPage() {
     } = useCreateOrder()
 
     return (
-        <div className="bg-muted/30 text-foreground">
-            <div className=" mx-auto space-y-6">
+        <div className="bg-muted/30 text-foreground p-4 md:p-8">
+            <div className="max-w-6xl mx-auto space-y-6">
                 <CreateOrderHeader onBack={goBack} />
 
                 <form
@@ -28,7 +32,7 @@ export default function CreateOrderPage() {
                     className="grid grid-cols-1 lg:grid-cols-3 gap-6"
                 >
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Bước 1 */}
+                        {/* Bước 1: Người gửi */}
                         <AddressSection
                             type="sender"
                             stepNumber={1}
@@ -38,7 +42,7 @@ export default function CreateOrderPage() {
                             onSelectAddress={(id) => selectAddressFromBook("sender", id)}
                         />
 
-                        {/* Bước 2 */}
+                        {/* Bước 2: Người nhận */}
                         <AddressSection
                             type="receiver"
                             stepNumber={2}
@@ -48,16 +52,18 @@ export default function CreateOrderPage() {
                             onSelectAddress={(id) => selectAddressFromBook("receiver", id)}
                         />
 
-                        {/* Bước 3 */}
+                        {/* Bước 3: Thông tin hàng hoá */}
                         <PackageInfoSection form={form} />
                     </div>
 
+                    {/* Cột phải: Bảng tính phí */}
                     <div>
                         <OrderFeeSummary
                             calculationResult={calculationResult}
                             weight={weightWatch}
                             isCreating={isCreating}
                             canSubmit={canSubmit}
+                            isCalculating={isCalculating}
                         />
                     </div>
                 </form>

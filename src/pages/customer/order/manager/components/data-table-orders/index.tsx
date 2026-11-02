@@ -1,4 +1,3 @@
-// src/pages/customer/orders/components/table-orders.tsx
 import { DataTable } from "@/components/common/data-table"
 import { DataTableColumnsVisibility } from "@/components/common/data-table/data-table-columns-visibility"
 import { DataTableFacetedFilter } from "@/components/common/data-table/data-table-faceted-filter"
@@ -7,7 +6,7 @@ import { TableInstanceProvider } from "@/components/common/data-table/table-inst
 import { Button } from "@/components/ui/button"
 import { useDataTable } from "@/lib/hooks/use-data-table"
 import { Package, Plus } from "lucide-react"
-import { useNavigate } from "react-router"
+import { useNavigate, useSearchParams } from "react-router"
 import { getOrderColumns } from "./columns"
 import DataTableFloatingBar from "./floating-bar"
 import type { CustomerOrderType } from "./type"
@@ -19,6 +18,7 @@ interface Props {
 
 export default function TableOrders({ data, pageCount }: Props) {
     const navigate = useNavigate()
+    const [, setSearchParams] = useSearchParams()
 
     const handleView = (order: CustomerOrderType) => {
         navigate(`/customer/orders/${order.id}`)
@@ -65,8 +65,7 @@ export default function TableOrders({ data, pageCount }: Props) {
                         <span>Quản lý đơn hàng của tôi</span>
                     </h1>
                     <p className="text-xs text-muted-foreground mt-1">
-                        Tra cứu, lọc theo trạng thái và theo dõi lịch sử tất cả các đơn vận
-                        chuyển.
+                        Tra cứu, lọc theo trạng thái và theo dõi lịch sử tất cả các đơn vận chuyển.
                     </p>
                 </div>
 
@@ -85,9 +84,17 @@ export default function TableOrders({ data, pageCount }: Props) {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex flex-1 items-center space-x-2 w-full">
                             <DataTableInputSearch
-                                handleParamKeyword={(value: string) =>
-                                    table.getColumn("trackingCode")?.setFilterValue(value)
-                                }
+                                handleParamKeyword={(value: string) => {
+                                    setSearchParams((prev) => {
+                                        if (value) {
+                                            prev.set("search", value)
+                                        } else {
+                                            prev.delete("search")
+                                        }
+                                        prev.set("page", "1") // Reset về trang 1 khi tìm kiếm
+                                        return prev
+                                    })
+                                }}
                             />
 
                             {table.getColumn("status") && (
@@ -108,8 +115,8 @@ export default function TableOrders({ data, pageCount }: Props) {
                         <DataTableColumnsVisibility />
                     </div>
 
-                    {/* Bảng có viền mờ để phân tách khối */}
-                    <div className="rounded-2xl  overflow-hidden">
+                    {/* Bảng hiển thị dữ liệu */}
+                    <div className="rounded-2xl overflow-hidden">
                         <DataTable
                             table={table}
                             floatingBar={<DataTableFloatingBar table={table} />}
