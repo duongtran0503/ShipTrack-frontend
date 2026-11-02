@@ -1,4 +1,10 @@
+import DriverAvailabilityPage from "@/pages/driver/availability"
+import DriverChangePasswordPage from "@/pages/driver/change-password"
 import DriverDashboard from "@/pages/driver/dashboard"
+import DriverLicensePage from "@/pages/driver/license"
+import AvailableOrdersPage from "@/pages/driver/order/available"
+import AvailableOrderDetailPage from "@/pages/driver/order/available/detail"
+import DriverProfilePage from "@/pages/driver/profile"
 import UnderDevelopment from "@/routes/UnderDevelopment"
 import { Navigate, type RouteObject } from "react-router"
 
@@ -22,28 +28,19 @@ export const driverRoutes: RouteObject[] = [
             {
                 path: "profile",
                 element: (
-                    <UnderDevelopment
-                        title="Thông tin cá nhân"
-                        description="Xem và cập nhật hồ sơ tài xế: họ tên, email, số điện thoại, ảnh đại diện và điểm đánh giá trung bình."
-                    />
+                    <DriverProfilePage />
                 ),
             },
             {
                 path: "profile/license",
                 element: (
-                    <UnderDevelopment
-                        title="Thông tin bằng lái xe"
-                        description="Cập nhật số bằng lái, ngày cấp, ngày hết hạn và tải lên ảnh bằng lái để Admin xác minh."
-                    />
+                    <DriverLicensePage />
                 ),
             },
             {
                 path: "profile/change-password",
                 element: (
-                    <UnderDevelopment
-                        title="Đổi mật khẩu"
-                        description="Thay đổi mật khẩu đăng nhập để bảo vệ tài khoản tài xế khỏi truy cập trái phép."
-                    />
+                    <DriverChangePasswordPage />
                 ),
             },
 
@@ -51,10 +48,7 @@ export const driverRoutes: RouteObject[] = [
             {
                 path: "availability",
                 element: (
-                    <UnderDevelopment
-                        title="Trạng thái hoạt động"
-                        description="Bật/tắt trạng thái sẵn sàng nhận đơn. Khi bật, hệ thống sẽ điều phối đơn hàng phù hợp đến bạn qua SignalR."
-                    />
+                    <DriverAvailabilityPage />
                 ),
             },
 
@@ -62,19 +56,13 @@ export const driverRoutes: RouteObject[] = [
             {
                 path: "orders/available",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn hàng khả dụng"
-                        description="Danh sách đơn đang tìm tài xế, sắp xếp theo khoảng cách gần nhất. Xem chi tiết, lộ trình dự kiến trước khi nhận đơn."
-                    />
+                    <AvailableOrdersPage />
                 ),
             },
             {
                 path: "orders/available/:id",
                 element: (
-                    <UnderDevelopment
-                        title="Chi tiết đơn khả dụng"
-                        description="Xem địa chỉ lấy/giao, khoảng cách, phí vận chuyển và lộ trình dự kiến trước khi nhận đơn."
-                    />
+                    <AvailableOrderDetailPage />
                 ),
             },
 

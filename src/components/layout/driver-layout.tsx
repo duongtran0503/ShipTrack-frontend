@@ -15,8 +15,9 @@ export default function DriverLayout({ children }: { children: ReactNode }) {
                 </div>
                 <main className=' flex-1 flex flex-col ml-4 scrollbar-hide'>
 
-                    <div className=' pr-6 pb-6'>
-                        <div className="pl-2">
+
+                    <div className=' pr-6 pb-6 pl-4'>
+                        <div className="">
                             <HeaderAdminManager metaRoutes={DRIVER_ROUTE_METADATA} navItems={DRIVER_NAV_ITEMS} />
                         </div>
                         {children}</div>
