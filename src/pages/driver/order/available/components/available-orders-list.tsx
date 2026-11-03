@@ -1,10 +1,10 @@
 import { EmptyOrdersState } from "@/pages/driver/order/available/components/empty-orders-state";
+import type { OrderItem } from "@/services/order/type";
 import { Loader2 } from "lucide-react";
-import type { AvailableOrder } from "../hooks/use-available-orders";
 import { AvailableOrderCard } from "./available-order-card";
 
 interface Props {
-    orders: AvailableOrder[];
+    orders: OrderItem[]; // Cập nhật sang OrderItem
     isLoading: boolean;
     isAccepting: boolean;
     onAccept: (id: string | number) => void;

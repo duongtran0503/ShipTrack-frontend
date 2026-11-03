@@ -47,6 +47,7 @@ export function useDriverChangePassword() {
     })
 
     const { watch, reset } = form
+    // eslint-disable-next-line react-hooks/incompatible-library
     const newPasswordValue = watch("newPassword")
     const strength = calculatePasswordStrength(newPasswordValue)
 

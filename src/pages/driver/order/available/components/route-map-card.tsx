@@ -1,24 +1,38 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { OrderMapView } from "./order-map-view"; // Import từ file gốc của bạn
 
 
+interface RouteMapCardProps {
+    pickupLat: number;
+    pickupLng: number;
+    dropoffLat: number;
+    dropoffLng: number;
+    pickupAddress: string;
+    dropoffAddress: string;
+}
 
-export function RouteMapCard() {
+export function RouteMapCard({
+    pickupAddress,
+    dropoffAddress,
+}: RouteMapCardProps) {
     return (
         <Card className="rounded-[24px] border-border/50 shadow-sm bg-card overflow-hidden">
             <CardHeader className="pb-4 pt-6 px-6 border-b border-border/40">
-                <CardTitle className="text-base font-bold text-foreground">
-                    Bản đồ lộ trình & Địa chỉ người nhận
+                <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                    <span>Bản đồ lộ trình & Định vị</span>
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-                <OrderMapView
-                    driverCoords={[10.762622, 106.660172]} // Toạ độ tài xế (Lấy từ SignalR realtime)
-                    pickupCoords={[10.7769, 106.7009]}     // Toạ độ lấy hàng (Từ Order)
-                    dropoffCoords={[10.7829, 106.6852]}    // Toạ độ giao hàng (Từ Order)
-                    pickupAddress="Kho Tổng Q.1"
-                    dropoffAddress="123 Nguyễn Thị Minh Khai, Q.3"
-                />
+                {/* Bạn có thể thay thế bằng OrderMapView thực tế */}
+                <div className="w-full h-72 rounded-[20px] bg-muted/50 flex flex-col items-center justify-center text-center p-6 space-y-2 relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#710105_1px,transparent_1px)] [background-size:16px_16px]" />
+                    <p className="text-xs font-bold text-foreground">Hệ thống bản đồ định tuyến ShipTrack</p>
+                    <p className="text-[11px] text-muted-foreground max-w-xs">
+                        Điểm lấy: <strong className="text-foreground">{pickupAddress}</strong>
+                    </p>
+                    <p className="text-[11px] text-muted-foreground max-w-xs">
+                        Điểm giao: <strong className="text-foreground">{dropoffAddress}</strong>
+                    </p>
+                </div>
             </CardContent>
         </Card>
     );

@@ -1,13 +1,12 @@
-import type { AvailableOrder } from "@/pages/driver/order/available/hooks/use-available-orders";
+import type { OrderItem } from "@/services/order/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
-export interface OrderDetailItem extends AvailableOrder {
+export interface OrderDetailItem extends OrderItem {
     itemDescription: string;
     itemWeight: string;
     noteForDriver: string;
-    customerPhone: string;
     pickupTime: string;
 }
 
@@ -26,20 +25,19 @@ export function useAvailableOrderDetail() {
             const saved = localStorage.getItem(AVAILABLE_ORDERS_STORAGE_KEY)
             if (!saved) throw new Error("Không tìm thấy dữ liệu đơn hàng.")
 
-            const orders: AvailableOrder[] = JSON.parse(saved)
+            const orders: OrderItem[] = JSON.parse(saved)
             const found = orders.find((o) => String(o.id) === String(id))
 
             if (!found) {
                 throw new Error("Rất tiếc! Đơn hàng này có thể đã bị tài xế khác nhận hoặc không còn tồn tại.")
             }
 
-            // Bổ sung thêm các chi tiết mở rộng cho trang detail
+            // Bổ sung các thông tin chi tiết mở rộng dựa trên OrderItem chuẩn
             const detailedOrder: OrderDetailItem = {
                 ...found,
-                itemDescription: "Hộp quà điện tử / Tài liệu quan trọng",
-                itemWeight: "1.2 kg",
-                noteForDriver: "Vui lòng gọi trước khi đến 10 phút, hàng dễ vỡ xin nhẹ tay.",
-                customerPhone: "0912***889",
+                itemDescription: found.packageName || "Hộp quà điện tử / Tài liệu quan trọng",
+                itemWeight: `${found.weightKg || 1.2} kg`,
+                noteForDriver: found.note || "Vui lòng gọi trước khi đến 10 phút, hàng dễ vỡ xin nhẹ tay.",
                 pickupTime: "Cần lấy ngay trong 15 phút",
             }
 
@@ -55,7 +53,7 @@ export function useAvailableOrderDetail() {
             const saved = localStorage.getItem(AVAILABLE_ORDERS_STORAGE_KEY)
             if (!saved) throw new Error("Xung đột dữ liệu hệ thống.")
 
-            const orders: AvailableOrder[] = JSON.parse(saved)
+            const orders: OrderItem[] = JSON.parse(saved)
             const exists = orders.find((o) => String(o.id) === String(orderId))
 
             if (!exists) {
@@ -65,11 +63,18 @@ export function useAvailableOrderDetail() {
             // Xóa khỏi danh sách khả dụng
             const updated = orders.filter((o) => String(o.id) === String(orderId))
             localStorage.setItem(AVAILABLE_ORDERS_STORAGE_KEY, JSON.stringify(updated))
+
+            // Đẩy sang Active Orders
+            const activeSaved = localStorage.getItem("shiptrack_active_orders_mock")
+            const activeList = activeSaved ? JSON.parse(activeSaved) : []
+            localStorage.setItem("shiptrack_active_orders_mock", JSON.stringify([{ ...exists, status: "DELIVERING" }, ...activeList]))
+
             return true
         },
         onSuccess: () => {
-            toast.success("Nhận đơn hàng thành công! Đang chuyển đến màn hình điều phối.")
+            toast.success("Nhận đơn hàng thành công! Đang chuyển đến màn hình quản lý đơn.")
             queryClient.invalidateQueries({ queryKey: ["driver_available_orders"] })
+            queryClient.invalidateQueries({ queryKey: ["driver_active_orders"] })
             navigate("/driver/orders/active")
         },
         onError: (err: any) => {

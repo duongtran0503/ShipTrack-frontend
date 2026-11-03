@@ -52,14 +52,19 @@ export default function AvailableOrderDetailPage() {
                 {/* Cột trái (2 span): Lộ trình & Bản đồ */}
                 <div className="md:col-span-2 space-y-6">
                     <RouteTimeline
-                        pickupAddress={order.pickupAddress}
-                        dropoffAddress={order.dropoffAddress}
+                        pickupAddress={order.senderAddress}
+                        dropoffAddress={order.receiverAddress}
                         pickupTime={order.pickupTime}
                         distanceKm={order.distanceKm}
-                        estimatedMinutes={order.estimatedMinutes}
+                        estimatedMinutes={15} // Hoặc ước tính dựa trên khoảng cách
                     />
                     <RouteMapCard
-
+                        pickupLat={order.pickupLat}
+                        pickupLng={order.pickupLng}
+                        dropoffLat={order.dropoffLat}
+                        dropoffLng={order.dropoffLng}
+                        pickupAddress={order.senderAddress}
+                        dropoffAddress={order.receiverAddress}
                     />
                 </div>
 
@@ -71,8 +76,8 @@ export default function AvailableOrderDetailPage() {
                         noteForDriver={order.noteForDriver}
                     />
                     <CustomerInfoCard
-                        customerName={order.customerName}
-                        customerPhone={order.customerPhone}
+                        customerName={order.receiverName || "Khách hàng"}
+                        customerPhone={order.receiverPhone || "0909xxxxxx"}
                     />
                 </div>
             </div>

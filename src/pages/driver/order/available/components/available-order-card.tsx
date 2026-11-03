@@ -1,14 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { OrderItem } from "@/services/order/type";
 import { Clock, Loader2, MapPin, Navigation } from "lucide-react";
-import type { AvailableOrder } from "../hooks/use-available-orders";
 
 interface Props {
-    order: AvailableOrder;
+    order: OrderItem;
     isAccepting: boolean;
-    onAccept: (id: string | number) => void;
-    onViewDetail: (id: string | number) => void;
+    onAccept: (id: string) => void;
+    onViewDetail: (id: string) => void;
 }
 
 export function AvailableOrderCard({ order, isAccepting, onAccept, onViewDetail }: Props) {
@@ -21,10 +21,10 @@ export function AvailableOrderCard({ order, isAccepting, onAccept, onViewDetail 
                             #{order.trackingCode}
                         </Badge>
                         <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted/50 px-2.5 py-0.5 rounded-full font-medium">
-                            {order.createdAt}
+                            {order.packageName} ({order.weightKg} kg)
                         </Badge>
                     </div>
-                    <span className="text-base font-black text-shiptrack-price">
+                    <span className="text-base font-black text-[#710105]">
                         {order.shippingFee.toLocaleString("vi-VN")} đ
                     </span>
                 </div>
@@ -34,7 +34,8 @@ export function AvailableOrderCard({ order, isAccepting, onAccept, onViewDetail 
                         <MapPin className="size-4 text-destructive shrink-0 mt-0.5" />
                         <div className="min-w-0">
                             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Lấy hàng:</span>
-                            <p className="font-semibold text-foreground truncate">{order.pickupAddress}</p>
+                            {/* Dùng chuẩn senderAddress từ OrderItem */}
+                            <p className="font-semibold text-foreground truncate">{order.senderAddress}</p>
                         </div>
                     </div>
 
@@ -42,7 +43,8 @@ export function AvailableOrderCard({ order, isAccepting, onAccept, onViewDetail 
                         <Navigation className="size-4 text-primary shrink-0 mt-0.5" />
                         <div className="min-w-0">
                             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Giao hàng:</span>
-                            <p className="font-semibold text-foreground truncate">{order.dropoffAddress}</p>
+                            {/* Dùng chuẩn receiverAddress từ OrderItem */}
+                            <p className="font-semibold text-foreground truncate">{order.receiverAddress}</p>
                         </div>
                     </div>
                 </div>
@@ -54,7 +56,7 @@ export function AvailableOrderCard({ order, isAccepting, onAccept, onViewDetail 
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Clock className="size-3.5 text-amber-500" />
-                        <span>Dự kiến: <strong className="text-foreground">{order.estimatedMinutes} phút</strong></span>
+                        <span>Tiền thu hộ (COD): <strong className="text-foreground">{order.codAmount.toLocaleString("vi-VN")} đ</strong></span>
                     </div>
                 </div>
 
@@ -63,7 +65,7 @@ export function AvailableOrderCard({ order, isAccepting, onAccept, onViewDetail 
                         variant="outline"
                         size="sm"
                         onClick={() => onViewDetail(order.id)}
-                        className="h-10 rounded-xl text-xs font-bold px-4"
+                        className="h-10 rounded-xl text-xs font-bold px-4 cursor-pointer"
                     >
                         Xem chi tiết
                     </Button>
