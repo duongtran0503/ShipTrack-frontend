@@ -29,3 +29,22 @@ export interface DashboardStatsResponse {
     };
 }
 
+
+
+export interface CustomerAddress {
+    id: string | number;
+    ownerId?: number;
+    label: string;
+    contactName: string;
+    contactPhone: string;
+    fullAddress: string;
+    isDefault: boolean;
+    lat: number;
+    lng: number;
+}
+
+export interface AddressResponse {
+    status: string;
+    message: string;
+    data: CustomerAddress[] | CustomerAddress;
+}

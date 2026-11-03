@@ -1,10 +1,20 @@
 import DriverAvailabilityPage from "@/pages/driver/availability"
 import DriverChangePasswordPage from "@/pages/driver/change-password"
 import DriverDashboard from "@/pages/driver/dashboard"
+import DriverEarningsPage from "@/pages/driver/earnings"
+import DriverStatisticsPage from "@/pages/driver/earnings/statistics"
 import DriverLicensePage from "@/pages/driver/license"
+import ActiveOrdersPage from "@/pages/driver/order/active"
+import ActiveOrderDetailPage from "@/pages/driver/order/active/detail"
+import OrderRoutePage from "@/pages/driver/order/active/route"
 import AvailableOrdersPage from "@/pages/driver/order/available"
 import AvailableOrderDetailPage from "@/pages/driver/order/available/detail"
+import DriverHistoryPage from "@/pages/driver/order/history"
 import DriverProfilePage from "@/pages/driver/profile"
+import DriverVehiclePage from "@/pages/driver/vehicle"
+import VehicleEditPage from "@/pages/driver/vehicle/edit"
+import VehicleRegisterPage from "@/pages/driver/vehicle/register"
+import VehicleReplacePage from "@/pages/driver/vehicle/replace"
 import UnderDevelopment from "@/routes/UnderDevelopment"
 import { Navigate, type RouteObject } from "react-router"
 
@@ -70,94 +80,79 @@ export const driverRoutes: RouteObject[] = [
             {
                 path: "orders/active",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn đang thực hiện"
-                        description="Danh sách đơn đã nhận đang ở trạng thái DriverAssigned, PickedUp hoặc Delivering. Cập nhật trạng thái và gửi GPS real-time."
+                    <ActiveOrdersPage
                     />
                 ),
             },
             {
                 path: "orders/active/:id",
                 element: (
-                    <UnderDevelopment
-                        title="Chi tiết đơn đang giao"
-                        description="Cập nhật trạng thái đơn (PickedUp, Delivering, Completed, Failed), liên hệ khách hàng và gửi vị trí GPS real-time."
+                    <ActiveOrderDetailPage
                     />
                 ),
             },
             {
-                path: "orders/active/:id/route",
+                path: "orders/history",
                 element: (
-                    <UnderDevelopment
-                        title="Lộ trình giao hàng"
-                        description="Bản đồ lộ trình từ điểm lấy đến điểm giao, tính khoảng cách bằng OSRM và thời gian di chuyển dự kiến."
+                    <DriverHistoryPage
                     />
                 ),
             },
+            {
+                path: "orders/history/:id",
+                element: (
+                    <OrderRoutePage
+                    />
+                ),
+            },
+
+
 
             // ==================== NHÓM 2: QUẢN LÝ PHƯƠNG TIỆN ====================
             {
                 path: "vehicles",
                 element: (
-                    <UnderDevelopment
-                        title="Phương tiện của tôi"
-                        description="Danh sách xe đã đăng ký: biển số, loại xe, hãng, model, tải trọng và trạng thái phê duyệt từ Admin."
+                    <DriverVehiclePage
                     />
                 ),
             },
             {
                 path: "vehicles/create",
                 element: (
-                    <UnderDevelopment
-                        title="Thêm phương tiện mới"
-                        description="Đăng ký xe mới: nhập biển số, chọn loại xe, hãng, model, tải trọng và tải lên giấy tờ đăng ký."
+                    <VehicleRegisterPage
+
                     />
                 ),
             },
             {
                 path: "vehicles/:id/edit",
                 element: (
-                    <UnderDevelopment
-                        title="Cập nhật phương tiện"
-                        description="Chỉnh sửa thông tin xe: biển số, loại xe, tải trọng và cập nhật giấy tờ nếu cần."
+                    <VehicleEditPage
+
+                    />
+                ),
+            },
+            {
+                path: "vehicles/replace",
+                element: (
+                    <VehicleReplacePage
+
                     />
                 ),
             },
 
-            // ==================== NHÓM 6: LỊCH SỬ & THU NHẬP ====================
-            {
-                path: "history",
-                element: (
-                    <UnderDevelopment
-                        title="Lịch sử chuyến đi"
-                        description="Danh sách các đơn đã hoàn thành hoặc thất bại: thời gian, tuyến đường, phí vận chuyển và đánh giá từ khách hàng."
-                    />
-                ),
-            },
-            {
-                path: "history/:id",
-                element: (
-                    <UnderDevelopment
-                        title="Chi tiết chuyến đi"
-                        description="Thông tin đầy đủ của chuyến: thời gian, tuyến đường, phí, ảnh xác nhận và đánh giá từ khách hàng."
-                    />
-                ),
-            },
+
             {
                 path: "earnings",
                 element: (
-                    <UnderDevelopment
-                        title="Thu nhập của tôi"
-                        description="Tổng hợp thu nhập theo ngày/tuần/tháng, chi tiết từng chuyến và số dư ví hiện tại có thể rút."
+                    <DriverEarningsPage
                     />
                 ),
             },
             {
                 path: "earnings/statistics",
                 element: (
-                    <UnderDevelopment
-                        title="Thống kê cá nhân"
-                        description="Phân tích hiệu suất: tổng chuyến, tỷ lệ hoàn thành, thời gian online, đánh giá trung bình và xếp hạng."
+                    <DriverStatisticsPage
                     />
                 ),
             },

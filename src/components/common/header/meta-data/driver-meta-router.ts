@@ -10,6 +10,29 @@ export const DRIVER_ROUTE_METADATA: RouteMetadataType[] = [
             "Tổng quan hoạt động hôm nay: trạng thái sẵn sàng, đơn đang giao, thu nhập trong ngày và đánh giá gần nhất từ khách hàng.",
     },
 
+    // ... các route khác ...
+
+    // ==================== NHÓM 6: LỊCH SỬ & THU NHẬP ====================
+    {
+        href: "/driver/orders/history",
+        title: "Lịch sử giao hàng",
+        description:
+            "Xem lại danh sách các đơn hàng đã hoàn thành, đã hủy hoặc giao thất bại. Theo dõi chi tiết thu nhập và đánh giá từ khách hàng cho từng chuyến đi.",
+    },
+    {
+        href: "/driver/orders/history/:id",
+        title: "Chi tiết lịch sử đơn hàng",
+        description:
+            "Xem chi tiết thông tin của một chuyến đi đã kết thúc, bao gồm lộ trình, cước phí, thời gian hoàn thành và phản hồi của khách hàng.",
+    },
+    {
+        href: "/driver/history",
+        title: "Lịch sử chuyến đi (Cũ)",
+        description:
+            "Danh sách các đơn đã hoàn thành hoặc thất bại: thời gian, tuyến đường, phí vận chuyển và đánh giá từ khách hàng.",
+    },
+
+    // ... các route khác ...
     // ==================== NHÓM 1: QUẢN LÝ TÀI KHOẢN ====================
     {
         href: "/driver/profile",

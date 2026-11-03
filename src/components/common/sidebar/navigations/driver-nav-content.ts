@@ -79,6 +79,21 @@ export const DRIVER_NAV_ITEMS: NavItemType[] = [
         // Chức năng nhóm 5: Xem đơn đã nhận, cập nhật trạng thái, GPS, lộ trình, xác nhận giao
     },
 
+    {
+        id: "order-delivery-history",
+        label: "Lịch sử giao hàng",
+        icon: History,
+        href: "/driver/orders/history",
+        listUrl: [
+            "/driver/orders/history",
+            "/driver/orders/history/:id",
+        ],
+
+    },
+
+
+
+
     // ==================== NHÓM 2: QUẢN LÝ PHƯƠNG TIỆN ====================
     {
         id: "vehicles",
@@ -93,18 +108,7 @@ export const DRIVER_NAV_ITEMS: NavItemType[] = [
         // Chức năng nhóm 2: Xem danh sách, thêm, cập nhật, xóa, đặt xe mặc định
     },
 
-    // ==================== NHÓM 6: LỊCH SỬ & THU NHẬP ====================
-    {
-        id: "history",
-        label: "Lịch sử chuyến đi",
-        icon: History,
-        href: "/driver/history",
-        listUrl: [
-            "/driver/history",
-            "/driver/history/:id",
-        ],
-        // Chức năng nhóm 6.1, 6.2: Xem lịch sử chuyến đi, chi tiết chuyến
-    },
+
     {
         id: "earnings",
         label: "Thu nhập",
