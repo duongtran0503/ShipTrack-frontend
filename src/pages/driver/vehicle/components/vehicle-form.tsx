@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Lock, Save } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 import type { VehicleEditFormValues } from "../hooks/use-vehicle-edit";
 
@@ -21,39 +21,34 @@ export function VehicleForm({ form, onSubmit, isSubmitting, onCancel }: Props) {
             <CardContent className="p-6 sm:p-8">
                 <form onSubmit={onSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Biển số xe */}
+
+                        {/* Biển số xe (🔒 Đã khóa không cho sửa) */}
                         <div className="space-y-2">
-                            <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                                Biển số xe <span className="text-destructive">*</span>
+                            <Label className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                                Biển số xe <Lock className="size-3 text-muted-foreground" />
                             </Label>
                             <Input
                                 {...register("licensePlate")}
-                                className="h-11 rounded-xl text-xs bg-muted/40 font-mono font-bold"
+                                disabled // 👈 Khóa ô input
+                                className="h-11 rounded-xl text-xs bg-muted/60 font-mono font-bold text-muted-foreground cursor-not-allowed"
                             />
-                            {errors.licensePlate && (
-                                <span className="text-[11px] text-destructive font-semibold">
-                                    {errors.licensePlate.message}
-                                </span>
-                            )}
+                            <p className="text-[10px] text-muted-foreground italic">Biển số xe không thể thay đổi sau khi đăng ký.</p>
                         </div>
 
-                        {/* Hãng xe */}
+                        {/* Hãng xe (🔒 Đã khóa không cho sửa) */}
                         <div className="space-y-2">
-                            <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                                Hãng xe <span className="text-destructive">*</span>
+                            <Label className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                                Hãng xe <Lock className="size-3 text-muted-foreground" />
                             </Label>
                             <Input
                                 {...register("brand")}
-                                className="h-11 rounded-xl text-xs bg-muted/40 font-semibold"
+                                disabled // 👈 Khóa ô input
+                                className="h-11 rounded-xl text-xs bg-muted/60 font-semibold text-muted-foreground cursor-not-allowed"
                             />
-                            {errors.brand && (
-                                <span className="text-[11px] text-destructive font-semibold">
-                                    {errors.brand.message}
-                                </span>
-                            )}
+                            <p className="text-[10px] text-muted-foreground italic">Hãng xe được cố định theo đăng ký ban đầu.</p>
                         </div>
 
-                        {/* Model / Dòng xe */}
+                        {/* Model / Dòng xe (Vẫn cho phép sửa) */}
                         <div className="space-y-2">
                             <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
                                 Model / Dòng xe <span className="text-destructive">*</span>
@@ -69,7 +64,7 @@ export function VehicleForm({ form, onSubmit, isSubmitting, onCancel }: Props) {
                             )}
                         </div>
 
-                        {/* Màu sắc xe */}
+                        {/* Màu sắc xe (Vẫn cho phép sửa) */}
                         <div className="space-y-2">
                             <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
                                 Màu sắc xe <span className="text-destructive">*</span>
@@ -85,6 +80,7 @@ export function VehicleForm({ form, onSubmit, isSubmitting, onCancel }: Props) {
                             )}
                         </div>
 
+                        {/* Tải trọng tối đa (Vẫn cho phép sửa) */}
                         {/* Tải trọng tối đa */}
                         <div className="space-y-2 sm:col-span-2">
                             <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
@@ -92,15 +88,16 @@ export function VehicleForm({ form, onSubmit, isSubmitting, onCancel }: Props) {
                             </Label>
                             <Input
                                 type="number"
-                                {...register("weightCapacityKg", { valueAsNumber: true })}
+                                {...register("maxWeightKg", { valueAsNumber: true })} // 👈 Đổi từ weightCapacityKg thành maxWeightKg
                                 className="h-11 rounded-xl text-xs bg-muted/40 font-semibold"
                             />
-                            {errors.weightCapacityKg && (
+                            {errors.maxWeightKg && ( // 👈 Sửa ở đây luôn
                                 <span className="text-[11px] text-destructive font-semibold">
-                                    {errors.weightCapacityKg.message}
+                                    {errors.maxWeightKg.message}
                                 </span>
                             )}
                         </div>
+
                     </div>
 
                     {/* Nút Submit & Hủy */}

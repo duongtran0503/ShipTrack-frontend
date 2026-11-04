@@ -1,4 +1,4 @@
-import { useDriverVehicle } from "@/pages/driver/vehicle/hooks/use-driver-vehicle";
+import { useDriverVehicle, type UpsertVehicleRequest } from "@/pages/driver/vehicle/hooks/use-driver-vehicle";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
@@ -7,10 +7,9 @@ import * as z from "zod";
 export const vehicleRegisterSchema = z.object({
     vehicleType: z.enum(["MOTORBIKE", "CAR", "TRUCK"]),
     licensePlate: z.string().min(1, "Vui lòng nhập biển số xe"),
-    brand: z.string().min(1, "Vui lòng nhập hãng xe"),
-    model: z.string().min(1, "Vui lòng nhập model dòng xe"),
-    color: z.string().min(1, "Vui lòng nhập màu sắc xe"),
-    weightCapacityKg: z.number().min(1, "Tải trọng phải lớn hơn 0"),
+    brand: z.string().optional(),
+    color: z.string().optional(),
+    maxWeightKg: z.number().min(1, "Tải trọng phải lớn hơn 0"),
 });
 
 export type VehicleRegisterFormValues = z.infer<typeof vehicleRegisterSchema>;
@@ -22,28 +21,32 @@ export function useVehicleRegister() {
     const form = useForm<VehicleRegisterFormValues>({
         resolver: zodResolver(vehicleRegisterSchema),
         defaultValues: {
-            vehicleType: "MOTORBIKE",
+            vehicleType: "MOTORBIKE", // Đặt giá trị mặc định hợp lệ khớp với z.enum
             licensePlate: "",
             brand: "",
-            model: "",
             color: "",
-            weightCapacityKg: 50,
+            maxWeightKg: 50,
         },
     });
 
     const onSubmit = async (data: VehicleRegisterFormValues) => {
-        const typeLabels = {
-            MOTORBIKE: "Xe máy",
-            CAR: "Ô tô",
-            TRUCK: "Xe tải",
+        // Ánh xạ từ string sang số (number) khớp với C# Enum VehicleType ở Backend
+        const vehicleTypeMapping: Record<string, number> = {
+            MOTORBIKE: 0,
+            CAR: 1,
+            TRUCK: 2,
         };
 
-        await registerVehicle({
-            ...data,
-            vehicleTypeLabel: typeLabels[data.vehicleType],
-            vehicleImageUrl: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600",
-            licensePlateImageUrl: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=300",
-        });
+        const payload = {
+            vehicleType: vehicleTypeMapping[data.vehicleType] ?? 0,
+            licensePlate: data.licensePlate,
+            brand: data.brand || null,
+            color: data.color || null,
+            maxWeightKg: data.maxWeightKg,
+        };
+
+        // Ép kiểu sang UpsertVehicleRequest nếu interface bên hook yêu cầu number
+        await registerVehicle(payload as unknown as UpsertVehicleRequest);
     };
 
     return {

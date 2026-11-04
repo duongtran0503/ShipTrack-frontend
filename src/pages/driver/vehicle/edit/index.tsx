@@ -18,7 +18,7 @@ export default function VehicleEditPage() {
             <VehicleHeader onGoBack={navigateBack} />
 
             {/* Khối thông tin loại xe cố định */}
-            <VehicleReadonlyInfo vehicleTypeLabel={vehicle.vehicleTypeLabel} />
+            <VehicleReadonlyInfo vehicleTypeLabel={vehicle.licensePlate} />
 
             {/* Form cập nhật */}
             <VehicleForm

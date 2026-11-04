@@ -3,14 +3,15 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
 import * as z from "zod"
-import { useDriverVehicle } from "./use-driver-vehicle"
+import { useDriverVehicle, type UpsertVehicleRequest } from "./use-driver-vehicle"
 
-// Định nghĩa schema validation với Zod
+// Định nghĩa schema validation với Zod cho việc đăng ký xe mới thay thế
 export const vehicleReplaceSchema = z.object({
+    vehicleType: z.enum(["MOTORBIKE", "CAR", "TRUCK"]),
     licensePlate: z.string().min(1, "Vui lòng nhập biển số xe mới"),
-    brand: z.string().min(1, "Vui lòng nhập hãng xe"),
-    model: z.string().min(1, "Vui lòng nhập model xe"),
-    color: z.string().min(1, "Vui lòng nhập màu sắc xe"),
+    brand: z.string().optional(),
+    color: z.string().optional(),
+    maxWeightKg: z.number().min(1, "Tải trọng phải lớn hơn 0"),
     reason: z.string().min(5, "Lý do thay xe phải có ít nhất 5 ký tự"),
 })
 
@@ -18,17 +19,18 @@ export type VehicleReplaceFormValues = z.infer<typeof vehicleReplaceSchema>
 
 export function useVehicleReplace() {
     const navigate = useNavigate()
-    const { vehicle, replaceVehicle, isSubmitting } = useDriverVehicle()
+    const { vehicle, registerVehicle, isSubmitting } = useDriverVehicle()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [pendingData, setPendingData] = useState<VehicleReplaceFormValues | null>(null)
 
     const form = useForm<VehicleReplaceFormValues>({
         resolver: zodResolver(vehicleReplaceSchema),
         defaultValues: {
+            vehicleType: vehicle?.vehicleType || "MOTORBIKE",
             licensePlate: "",
             brand: "",
-            model: "",
             color: "",
+            maxWeightKg: 50,
             reason: "",
         },
     })
@@ -39,19 +41,19 @@ export function useVehicleReplace() {
         setIsModalOpen(true)
     }
 
-    // Bước 2: Xác nhận cuối cùng trong Modal
+    // Bước 2: Xác nhận cuối cùng trong Modal -> Gọi API POST tạo xe mới
     const handleConfirmReplace = async () => {
         if (!pendingData) return
 
-        await replaceVehicle({
+        const payload: UpsertVehicleRequest = {
+            vehicleType: pendingData.vehicleType,
             licensePlate: pendingData.licensePlate,
-            brand: pendingData.brand,
-            model: pendingData.model,
-            color: pendingData.color,
-            weightCapacityKg: 50,
-            vehicleImageUrl: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600",
-            licensePlateImageUrl: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=300",
-        })
+            brand: pendingData.brand || undefined,
+            color: pendingData.color || undefined,
+            maxWeightKg: pendingData.maxWeightKg,
+        }
+
+        await registerVehicle(payload)
         setIsModalOpen(false)
     }
 
