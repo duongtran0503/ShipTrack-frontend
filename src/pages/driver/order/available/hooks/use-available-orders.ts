@@ -1,129 +1,107 @@
-import type { OrderItem } from "@/services/order/type";
+import { apiClient } from "@/lib/config/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
-export type SortOption = "distance" | "time_asc" | "time_desc" | "fee_desc" | "fee_asc" | null;
-
-const AVAILABLE_ORDERS_STORAGE_KEY = "shiptrack_available_orders_mock"
-
-const getMockAvailableOrders = (): OrderItem[] => {
-    const saved = localStorage.getItem(AVAILABLE_ORDERS_STORAGE_KEY)
-    if (saved) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        try { return JSON.parse(saved) } catch (e) { /* ignore */ }
-    }
-    const defaultData: OrderItem[] = [
-        {
-            id: "ord_101",
-            trackingCode: "ST-9912",
-            senderAddress: "12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, TP.HCM",
-            pickupLat: 10.8221,
-            pickupLng: 106.6869,
-            senderName: "Công ty TNHH ABC",
-            senderPhone: "0901112223",
-            receiverAddress: "45 Lê Duẩn, Bến Nghé, Quận 1, TP.HCM",
-            dropoffLat: 10.7769,
-            dropoffLng: 106.7009,
-            receiverName: "Nguyễn Văn A",
-            receiverPhone: "0909123456",
-            packageName: "Hộp quà điện tử / Tài liệu",
-            weightKg: 1.2,
-            shippingFee: 45000,
-            vehicleType: "MOTORBIKE",
-            serviceType: "STANDARD",
-            paymentMethod: "CASH",
-            isBulky: false,
-            isDoorDelivery: true,
-            codAmount: 150000,
-            distanceKm: 4.5,
-            status: "SEARCHING_DRIVER",
-            createdAt: "2026-11-03T08:00:00Z",
-        },
-        // Thêm các mẫu dữ liệu khác tương tự...
-    ]
-    localStorage.setItem(AVAILABLE_ORDERS_STORAGE_KEY, JSON.stringify(defaultData))
-    return defaultData
+export interface AvailableOrderItem {
+    id: number;
+    trackingCode: string;
+    pickupAddress: string;
+    dropoffAddress: string;
+    pickupLat: number;
+    pickupLng: number;
+    dropoffLat: number;
+    dropoffLng: number;
+    distanceFromDriverKm: number;
+    tripDistanceKm: number;
+    shippingFee: number;
+    serviceType: string;
+    vehicleType: string;
+    createdAtUtc: string;
 }
 
+export type SortOption = "distance" | "time_asc" | "time_desc" | "fee_desc" | "fee_asc" | null;
+
 export function useAvailableOrders() {
-    const navigate = useNavigate()
-    const queryClient = useQueryClient()
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    const [minDistance, setMinDistance] = useState<string>("")
-    const [maxDistance, setMaxDistance] = useState<string>("")
-    const [sortBy, setSortBy] = useState<SortOption>(null)
+    const [minDistance, setMinDistance] = useState<string>("");
+    const [maxDistance, setMaxDistance] = useState<string>("");
+    const [sortBy, setSortBy] = useState<SortOption>(null);
 
-    const { data: orders = [], isLoading } = useQuery({
-        queryKey: ["driver_available_orders"],
+    // 1. Lấy trạng thái Online của tài xế
+    const { data: statusResponse, isLoading: isStatsLoading, isSuccess: isStatusLoaded } = useQuery({
+        queryKey: ["driver_dashboard_stats"],
         queryFn: async () => {
-            await new Promise((r) => setTimeout(r, 300))
-            return getMockAvailableOrders()
+            const response = await apiClient.get("/drivers/status");
+            const raw = response.data.data || response.data;
+            return raw as { isOnline: boolean;[key: string]: any };
         },
-    })
+        staleTime: 10000,
+    });
 
-    // Khi backend thật hoạt động, chỉ cần thay đổi queryFn gọi API Axios:
-    // queryFn: async () => { const res = await apiClient.get('/api/driver/orders/available'); return res.data.data; }
+    const isOnline = Boolean(statusResponse?.isOnline);
 
+    // 2. Lấy danh sách đơn hàng khả dụng (CHỈ KHI ĐÃ TẢI XONG STATUS VÀ PHẢI ĐANG ONLINE)
+    const { data: orders = [], isLoading: isOrdersLoading } = useQuery({
+        queryKey: ["driver_available_orders", isOnline],
+        queryFn: async () => {
+            const response = await apiClient.get("/driver/orders/available");
+            const raw = response.data.data || response.data;
+            return Array.isArray(raw) ? (raw as AvailableOrderItem[]) : [];
+        },
+        // Đảm bảo chỉ bật khi API status đã load xong VÀ isOnline thực sự là true
+        enabled: isStatusLoaded && isOnline === true,
+        refetchInterval: isOnline ? 5000 : false,
+    });
+
+    // 3. Mutation Nhận đơn hàng
     const acceptOrderMutation = useMutation({
-        mutationFn: async (orderId: string) => {
-            await new Promise((r) => setTimeout(r, 500))
-            const current = getMockAvailableOrders()
-            const exists = current.find((o) => o.id === orderId)
-
-            if (!exists) {
-                throw new Error("Rất tiếc! Đơn hàng này đã được tài xế khác nhận trước đó.")
-            }
-
-            // Cập nhật trạng thái sang DELIVERING hoặc ACCEPTED_TO_PICKUP trên backend
-            const updatedList = current.filter((o) => o.id !== orderId)
-            localStorage.setItem(AVAILABLE_ORDERS_STORAGE_KEY, JSON.stringify(updatedList))
-
-            // Lưu sang kho lưu trữ đơn đang thực hiện (Active Orders)
-            const activeSaved = localStorage.getItem("shiptrack_active_orders_mock")
-            const activeList = activeSaved ? JSON.parse(activeSaved) : []
-            localStorage.setItem("shiptrack_active_orders_mock", JSON.stringify([{ ...exists, status: "DELIVERING" }, ...activeList]))
-
-            return true
+        mutationFn: async (orderId: number) => {
+            const res = await apiClient.post(`/driver/orders/${orderId}/accept`);
+            return res.data;
         },
         onSuccess: () => {
-            toast.success("Nhận đơn hàng thành công! Đã chuyển sang danh sách đơn đang thực hiện.")
-            queryClient.invalidateQueries({ queryKey: ["driver_available_orders"] })
-            navigate("/driver/orders/active")
+            toast.success("Nhận đơn hàng thành công! Đã chuyển sang danh sách đơn đang thực hiện.");
+            queryClient.invalidateQueries({ queryKey: ["driver_available_orders"] });
+            navigate("/driver/orders/active");
         },
         onError: (err: any) => {
-            toast.error(err?.message || "Nhận đơn thất bại do xung đột dữ liệu!")
+            toast.error(err?.response?.data?.message || "Nhận đơn thất bại do đơn đã được tài xế khác nhận!");
         },
-    })
+    });
 
-    // Lọc và sắp xếp khớp chuẩn các trường của OrderItem
+    // Lọc và sắp xếp danh sách đơn hàng
     const filteredOrders = orders.filter((order) => {
-        const min = minDistance !== "" ? parseFloat(minDistance) : null
-        const max = maxDistance !== "" ? parseFloat(maxDistance) : null
+        const min = minDistance !== "" ? parseFloat(minDistance) : null;
+        const max = maxDistance !== "" ? parseFloat(maxDistance) : null;
+        const distance = order.distanceFromDriverKm || 0;
 
-        if (min !== null && order.distanceKm < min) return false
-        if (max !== null && order.distanceKm > max) return false
-        return true
+        if (min !== null && distance < min) return false;
+        if (max !== null && distance > max) return false;
+        return true;
     }).sort((a, b) => {
-        if (!sortBy) return 0
-        if (sortBy === "distance") return a.distanceKm - b.distanceKm
-        if (sortBy === "fee_desc") return b.shippingFee - a.shippingFee
-        if (sortBy === "fee_asc") return a.shippingFee - b.shippingFee
-        return 0
-    })
+        if (!sortBy) return 0;
+        if (sortBy === "distance") return (a.distanceFromDriverKm || 0) - (b.distanceFromDriverKm || 0);
+        if (sortBy === "fee_desc") return b.shippingFee - a.shippingFee;
+        if (sortBy === "fee_asc") return a.shippingFee - b.shippingFee;
+        return 0;
+    });
 
     return {
         orders: filteredOrders,
-        isLoading,
+        isLoading: isStatsLoading || (isOnline && isOrdersLoading),
+        isOnline,
         minDistance,
         setMinDistance,
         maxDistance,
         setMaxDistance,
         sortBy,
         setSortBy,
-        acceptOrder: (id: string) => acceptOrderMutation.mutate(id),
+        acceptOrder: (id: number) => acceptOrderMutation.mutate(id),
         isAccepting: acceptOrderMutation.isPending,
-        viewDetail: (id: string) => navigate(`/driver/orders/available/${id}`),
-    }
+        viewDetail: (id: number) => navigate(`/driver/orders/available/${id}`),
+    };
 }
