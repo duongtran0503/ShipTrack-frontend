@@ -31,11 +31,13 @@ export const DRIVER_NAV_ITEMS: NavItemType[] = [
         href: "/driver/profile",
         listUrl: [
             "/driver/profile",
+            "/driver/profile/service-areas",
             "/driver/profile/license",
             "/driver/profile/change-password",
         ],
         children: [
-            { label: "Thông tin cá nhân", href: "/driver/profile" },              // 1.4, 1.5
+            { label: "Thông tin cá nhân", href: "/driver/profile" },
+            { label: "Khu vực phục vụ", href: "/driver/profile/service-areas" },          // 1.4, 1.5
             { label: "Thông tin bằng lái", href: "/driver/profile/license" },     // 1.6
             { label: "Đổi mật khẩu", href: "/driver/profile/change-password" },   // 1.7
         ],

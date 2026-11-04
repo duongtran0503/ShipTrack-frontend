@@ -11,6 +11,7 @@ import AvailableOrdersPage from "@/pages/driver/order/available"
 import AvailableOrderDetailPage from "@/pages/driver/order/available/detail"
 import DriverHistoryPage from "@/pages/driver/order/history"
 import DriverProfilePage from "@/pages/driver/profile"
+import ServiceAreasPage from "@/pages/driver/service-areas"
 import DriverVehiclePage from "@/pages/driver/vehicle"
 import VehicleEditPage from "@/pages/driver/vehicle/edit"
 import VehicleRegisterPage from "@/pages/driver/vehicle/register"
@@ -45,6 +46,12 @@ export const driverRoutes: RouteObject[] = [
                 path: "profile/license",
                 element: (
                     <DriverLicensePage />
+                ),
+            },
+            {
+                path: "profile/service-areas",
+                element: (
+                    <ServiceAreasPage />
                 ),
             },
             {
@@ -92,6 +99,13 @@ export const driverRoutes: RouteObject[] = [
                 ),
             },
             {
+                path: "orders/active/:id/route",
+                element: (
+                    <OrderRoutePage
+                    />
+                ),
+            },
+            {
                 path: "orders/history",
                 element: (
                     <DriverHistoryPage
@@ -117,7 +131,7 @@ export const driverRoutes: RouteObject[] = [
                 ),
             },
             {
-                path: "vehicles/create",
+                path: "vehicles/register",
                 element: (
                     <VehicleRegisterPage
 
