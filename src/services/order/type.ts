@@ -32,8 +32,9 @@ export interface OrderItem {
     note?: string;
     codAmount: number;
     distanceKm: number;
+    distanceFromDriverKm?: number;
 
-    status: "PENDING" | "SEARCHING_DRIVER" | "DELIVERING" | "COMPLETED" | "CANCELLED" | "PICKED_UP";
+    status: "PENDING" | "SEARCHING_DRIVER" | "DELIVERING" | "COMPLETED" | "CANCELLED" | "PICKED_UP" | "DRIVER_ASSIGNED" | "FAILED";
     createdAt: string;
     driverName?: string;
     driverPhone?: string;
