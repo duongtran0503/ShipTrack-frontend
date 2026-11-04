@@ -7,6 +7,7 @@ import { useDriverHistory } from "./hooks/use-driver-history";
 export default function DriverHistoryPage() {
     const {
         orders,
+        totalOrdersCount,
         isLoading,
         statusFilter,
         setStatusFilter,
@@ -18,12 +19,18 @@ export default function DriverHistoryPage() {
         setChartPeriodTab,
         handleResetFilter,
         kpi,
+        chartData,
         viewDetail,
     } = useDriverHistory();
 
+
+
+    // Tính tổng số lượng đơn hoàn thành và thất bại từ chartData để hiển thị ở biểu đồ tròn
+    const totalCompleted = chartData.reduce((acc, curr) => acc + curr.completed, 0);
+    const totalFailed = chartData.reduce((acc, curr) => acc + curr.failed, 0);
+
     return (
         <div className="w-full space-y-8 pb-16 px-2 sm:px-4">
-
 
             {/* PHẦN A: THỐNG KÊ KPI */}
             <HistoryKpiCards kpi={kpi} />
@@ -32,6 +39,10 @@ export default function DriverHistoryPage() {
             <HistoryChartCard
                 chartPeriodTab={chartPeriodTab}
                 setChartPeriodTab={setChartPeriodTab}
+                chartData={chartData}
+                completionRate={kpi.completionRate}
+                totalCompleted={totalCompleted}
+                totalFailed={totalFailed}
             />
 
             {/* PHẦN C: BỘ LỌC */}
@@ -47,7 +58,7 @@ export default function DriverHistoryPage() {
 
             {/* Số lượng kết quả */}
             <div className="text-xs font-semibold text-muted-foreground px-1">
-                Tìm thấy <strong className="text-foreground">{orders.length}</strong> chuyến giao hàng
+                Tìm thấy <strong className="text-foreground">{totalOrdersCount}</strong> chuyến giao hàng
             </div>
 
             {/* PHẦN D: DANH SÁCH CHUYẾN ĐI */}

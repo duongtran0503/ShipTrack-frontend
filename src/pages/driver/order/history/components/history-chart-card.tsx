@@ -7,10 +7,15 @@ import {
 } from "@/components/ui/chart";
 import { CheckCircle2, MoreHorizontal, TrendingUp, XCircle } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
+import type { ChartItem } from "../hooks/use-driver-history";
 
 interface Props {
     chartPeriodTab: "WEEK" | "MONTH";
     setChartPeriodTab: (val: "WEEK" | "MONTH") => void;
+    chartData: ChartItem[];
+    completionRate: string;
+    totalCompleted: number;
+    totalFailed: number;
 }
 
 // ================= CẤU HÌNH BIỂU ĐỒ CỘT =================
@@ -19,40 +24,27 @@ const barChartConfig = {
     failed: { label: "Thất bại", color: "#ef4444" },
 } satisfies ChartConfig;
 
-const BAR_MOCK_DATA = {
-    WEEK: [
-        { label: "T2", completed: 12, failed: 1 },
-        { label: "T3", completed: 15, failed: 0 },
-        { label: "T4", completed: 8, failed: 2 },
-        { label: "T5", completed: 18, failed: 1 },
-        { label: "T6", completed: 22, failed: 0 },
-        { label: "T7", completed: 25, failed: 3 },
-        { label: "CN", completed: 10, failed: 0 },
-    ],
-    MONTH: [
-        { label: "Tuần 1", completed: 85, failed: 5 },
-        { label: "Tuần 2", completed: 92, failed: 3 },
-        { label: "Tuần 3", completed: 78, failed: 8 },
-        { label: "Tuần 4", completed: 110, failed: 2 },
-    ],
-};
-
-// ================= CẤU HÌNH BIỂU ĐỒ TRÒN KHUYẾT (BÁN NGUYỆT) =================
+// ================= CẤU HÌNH BIỂU ĐỒ TRÒN KHUYẾT =================
 const pieChartConfig = {
     rate: { label: "Tỷ lệ" },
     completed: { label: "Hoàn thành", color: "#10b981" },
-    failed: { label: "Thất bại", color: "#f3f4f6" },
+    failed: { label: "Thất bại", color: "var(--muted)" },
 } satisfies ChartConfig;
 
-const MOCK_RATE = 78; // Tỷ lệ hoàn thành mẫu (%)
-
-export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
-    const barData = BAR_MOCK_DATA[chartPeriodTab];
+export function HistoryChartCard({
+    chartPeriodTab,
+    setChartPeriodTab,
+    chartData,
+    completionRate,
+    totalCompleted,
+    totalFailed,
+}: Props) {
+    const rateNumber = parseFloat(completionRate) || 0;
 
     // Data cho biểu đồ bán nguyệt (180 độ)
     const pieData = [
-        { name: "completed", value: MOCK_RATE, fill: "#10b981" },
-        { name: "failed", value: 100 - MOCK_RATE, fill: "var(--muted)" },
+        { name: "completed", value: rateNumber, fill: "#10b981" },
+        { name: "failed", value: Math.max(0, 100 - rateNumber), fill: "var(--muted)" },
     ];
 
     return (
@@ -120,7 +112,7 @@ export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
                         </svg>
 
                         <ChartContainer config={barChartConfig} className="w-full h-[280px]">
-                            <BarChart data={barData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={4}>
+                            <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={4}>
                                 <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.2} />
                                 <XAxis
                                     dataKey="label"
@@ -145,12 +137,11 @@ export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
                         </ChartContainer>
                     </div>
 
-                    {/* ================= CỘT PHẢI: BIỂU ĐỒ BÁN NGUYỆT (FIXED) ================= */}
+                    {/* ================= CỘT PHẢI: BIỂU ĐỒ BÁN NGUYỆT ================= */}
                     <div className="lg:col-span-5 p-6 flex flex-col justify-between">
                         <div className="space-y-4">
                             <h3 className="text-sm font-bold text-foreground text-center">Tỷ lệ hoàn thành</h3>
 
-                            {/* Khung chứa biểu đồ bán nguyệt được fix chuẩn tâm */}
                             <div className="relative w-full h-[160px] flex items-center justify-center mt-2">
                                 <ChartContainer config={pieChartConfig} className="w-full h-full">
                                     <PieChart>
@@ -177,7 +168,7 @@ export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
                                 {/* Nhãn % căn giữa đè lên biểu đồ bán nguyệt */}
                                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center">
                                     <span className="text-3xl font-black text-foreground block leading-none tracking-tight">
-                                        {MOCK_RATE}%
+                                        {completionRate}%
                                     </span>
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1 block">
                                         Hoàn thành
@@ -186,11 +177,11 @@ export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
                             </div>
 
                             <p className="text-center text-[11px] font-medium text-muted-foreground px-4 pt-2">
-                                Tỷ lệ giao hàng thành công cao hơn <strong className="text-emerald-600">12%</strong> so với kỳ trước
+                                Tổng hợp hiệu suất thực tế từ các chuyến giao hàng đã hoàn thành.
                             </p>
                         </div>
 
-                        {/* Thẻ thống kê (Bottom Cards) */}
+                        {/* Thẻ thống kê tổng hợp (Bottom Cards) */}
                         <div className="grid grid-cols-2 gap-3 mt-6">
                             <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/40">
                                 <div className="size-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
@@ -198,7 +189,7 @@ export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Hoàn thành</p>
-                                    <p className="text-sm font-black text-foreground">120 <span className="text-[10px] text-muted-foreground font-normal">đơn</span></p>
+                                    <p className="text-sm font-black text-foreground">{totalCompleted} <span className="text-[10px] text-muted-foreground font-normal">đơn</span></p>
                                 </div>
                             </div>
 
@@ -208,7 +199,7 @@ export function HistoryChartCard({ chartPeriodTab, setChartPeriodTab }: Props) {
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Thất bại</p>
-                                    <p className="text-sm font-black text-foreground">34 <span className="text-[10px] text-muted-foreground font-normal">đơn</span></p>
+                                    <p className="text-sm font-black text-foreground">{totalFailed} <span className="text-[10px] text-muted-foreground font-normal">đơn</span></p>
                                 </div>
                             </div>
                         </div>

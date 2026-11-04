@@ -20,8 +20,7 @@ export function HistoryKpiCards({ kpi }: Props) {
                 </div>
                 <div>
                     <h2 className="text-xl font-black text-foreground">{kpi.totalFinished}</h2>
-                    {/* Màu xanh lá của brand (success) */}
-                    <p className="text-[10px] text-emerald-600 font-medium mt-0.5">↑ 12 so với tháng trước</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Các đơn đã hoàn thành hoặc kết thúc</p>
                 </div>
             </Card>
 
@@ -34,8 +33,7 @@ export function HistoryKpiCards({ kpi }: Props) {
                 <div>
                     <h2 className="text-xl font-black text-foreground">{kpi.completionRate}%</h2>
                     <div className="w-full bg-muted/40 h-1.5 rounded-full overflow-hidden mt-1.5">
-                        {/* Dùng màu xanh lá chuẩn của brand */}
-                        <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${kpi.completionRate}%` }} />
+                        <div className="bg-emerald-600 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(parseFloat(kpi.completionRate), 100)}%` }} />
                     </div>
                 </div>
             </Card>
@@ -49,8 +47,7 @@ export function HistoryKpiCards({ kpi }: Props) {
                 <div>
                     <h2 className="text-xl font-black text-foreground">{kpi.failureRate}%</h2>
                     <div className="w-full bg-muted/40 h-1.5 rounded-full overflow-hidden mt-1.5">
-                        {/* Dùng màu đỏ lỗi (destructive) của shadcn */}
-                        <div className="bg-destructive h-full rounded-full" style={{ width: `${kpi.failureRate}%` }} />
+                        <div className="bg-destructive h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(parseFloat(kpi.failureRate), 100)}%` }} />
                     </div>
                 </div>
             </Card>
@@ -77,14 +74,13 @@ export function HistoryKpiCards({ kpi }: Props) {
             <Card className={cardClass}>
                 <div className="flex items-center justify-between text-muted-foreground">
                     <span className="text-[10px] uppercase font-bold tracking-wider">Thời gian giao TB</span>
-                    {/* Dùng màu xanh dương (info) của brand */}
                     <Clock className="size-3.5 text-blue-500" />
                 </div>
                 <div>
                     <h2 className="text-xl font-black text-foreground">
                         {kpi.avgDeliveryMinutes} <span className="text-xs text-muted-foreground font-normal">phút</span>
                     </h2>
-                    <p className="text-[10px] text-emerald-600 font-medium mt-0.5">↓ 3 phút so với tháng trước</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Tính từ lúc nhận đến hoàn thành</p>
                 </div>
             </Card>
 
