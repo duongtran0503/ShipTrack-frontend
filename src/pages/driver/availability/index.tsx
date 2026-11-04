@@ -30,7 +30,7 @@ export default function DriverAvailabilityPage() {
 
     return (
         <div className="w-full space-y-6 pb-10">
-            {/* 1. Cảnh báo điều kiện */}
+            {/* 1. Cảnh báo điều kiện khi chưa có xe hoặc chưa duyệt */}
             <AvailabilityWarning availability={availability} canBeOnline={canBeOnline} />
 
             {/* 2. Toggle lớn chính giữa */}
@@ -50,7 +50,7 @@ export default function DriverAvailabilityPage() {
                 />
             </div>
 
-            {/* 4. Modal cảnh báo */}
+            {/* 4. Modal cảnh báo khi tắt online mà còn đơn active */}
             <OfflineWarningDialog
                 isOpen={showWarningModal}
                 onOpenChange={setShowWarningModal}

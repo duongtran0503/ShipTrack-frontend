@@ -1,14 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { apiClient } from "@/lib/config/axios";
+import { useSignalR } from "@/lib/hooks/use-signalr";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useDriverLocation } from "./use-driver-location";
+import { useDriverStatusMutation } from "./use-driver-status-mutation";
 
 export interface DriverAvailabilityState {
     isOnline: boolean;
-    statusText: "Rảnh" | "Đang giao" | "Offline";
+    statusText: "Đang hoạt động" | "Offline";
     activeOrdersCount: number;
     availableOrdersNearby: number;
     defaultVehicle: {
-        id: string;
+        id: string | number;
         plateNumber: string;
         vehicleType: string;
         model: string;
@@ -17,122 +21,152 @@ export interface DriverAvailabilityState {
     expiryDaysLeft: number;
 }
 
-// ==================== MOCK API / LOCALSTORAGE ====================
-const AVAILABILITY_STORAGE_KEY = "shiptrack_driver_availability_mock"
-
-const getMockAvailability = (): DriverAvailabilityState => {
-    const saved = localStorage.getItem(AVAILABILITY_STORAGE_KEY)
-    if (saved) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        try { return JSON.parse(saved) } catch (e) { /* ignore */ }
-    }
-    const defaultData: DriverAvailabilityState = {
-        isOnline: false,
-        statusText: "Offline",
-        activeOrdersCount: 1, // Giả lập đang có đơn chưa hoàn thành
-        availableOrdersNearby: 8,
-        defaultVehicle: {
-            id: "veh_01",
-            plateNumber: "59-C1 123.45",
-            vehicleType: "Xe máy",
-            model: "Honda Vision 2023",
-        },
-        licenseStatus: "APPROVED",
-        expiryDaysLeft: 450,
-    }
-    localStorage.setItem(AVAILABILITY_STORAGE_KEY, JSON.stringify(defaultData))
-    return defaultData
-}
-
-const saveMockAvailability = (data: DriverAvailabilityState) => {
-    localStorage.setItem(AVAILABILITY_STORAGE_KEY, JSON.stringify(data))
-}
-
 export function useDriverAvailability() {
-    const queryClient = useQueryClient()
-    const [showWarningModal, setShowWarningModal] = useState(false)
-    const [pendingToggleValue, setPendingToggleValue] = useState<boolean | null>(null)
+    const queryClient = useQueryClient();
+    const { connection, isConnected } = useSignalR();
 
-    // 1. Query lấy trạng thái hoạt động
+    const [showWarningModal, setShowWarningModal] = useState(false);
+    const [pendingToggleValue, setPendingToggleValue] = useState<boolean | null>(null);
+
+    const { startLocationTracking, stopLocationTracking } = useDriverLocation();
+    const { toggleStatus, isToggling } = useDriverStatusMutation({
+        onStartTracking: startLocationTracking,
+        onStopTracking: stopLocationTracking,
+    });
+
     const { data: availability, isLoading } = useQuery({
         queryKey: ["driver_availability"],
         queryFn: async () => {
-            await new Promise((r) => setTimeout(r, 300))
-            return getMockAvailability()
-        },
-    })
+            // 1. Lấy trạng thái online (bắt lỗi an toàn)
+            const statusRes = await apiClient.get("/drivers/status").catch(() => ({ data: { data: { isOnline: false } } }));
+            const statusData = statusRes.data.data || statusRes.data;
+            const isOnline = Boolean(statusData.isOnline);
 
-    // 2. Mutation bật/tắt trạng thái
-    const toggleMutation = useMutation({
-        mutationFn: async (nextStatus: boolean) => {
-            await new Promise((r) => setTimeout(r, 400))
-            const current = getMockAvailability()
+            // 2. Gọi từng API độc lập với .catch() riêng biệt để không bao giờ làm sập Promise.all chung
+            const vehiclePromise = apiClient.get("/driver/vehicles/current-active")
+                .then(res => res.data)
+                .catch(() => null);
 
-            // Kiểm tra điều kiện khi muốn bật (ON)
-            if (nextStatus) {
-                if (!current.defaultVehicle) {
-                    throw new Error("Bạn chưa thiết lập phương tiện mặc định. Vui lòng thêm xe trước khi bật nhận đơn.")
-                }
-                if (current.licenseStatus !== "APPROVED") {
-                    throw new Error("Bằng lái xe của bạn chưa được phê duyệt hoặc đã hết hạn. Không thể bật nhận đơn.")
-                }
-            }
+            const activeOrdersPromise = apiClient.get("/driver/orders/active")
+                .then(res => res.data)
+                .catch(() => []);
 
-            const updated: DriverAvailabilityState = {
-                ...current,
-                isOnline: nextStatus,
-                statusText: nextStatus ? "Rảnh" : "Offline",
-            }
-            saveMockAvailability(updated)
-            return updated
-        },
-        onSuccess: (updated) => {
-            toast.success(updated.isOnline ? "Đã bật trạng thái sẵn sàng nhận đơn!" : "Đã chuyển sang ngoại tuyến.")
-            queryClient.setQueryData(["driver_availability"], updated)
-        },
-        onError: (err: any) => {
-            toast.error(err?.message || "Không thể thay đổi trạng thái hoạt động!")
-        },
-    })
+            const availableOrdersPromise = isOnline
+                ? apiClient.get("/driver/orders/available")
+                    .then(res => res.data)
+                    .catch((err) => {
+                        // Bắt trọn mọi lỗi từ backend (kể cả "Chưa có phương tiện được duyệt" hoặc "Chưa bật sẵn sàng")
+                        console.warn("Bỏ qua lỗi lấy đơn available:", err?.response?.data?.message || err.message);
+                        return [];
+                    })
+                : Promise.resolve([]);
 
-    // Xử lý logic khi tài xế thao tác toggle
+            const [vehicleRes, activeOrdersRes, availableOrdersRes] = await Promise.all([
+                vehiclePromise,
+                activeOrdersPromise,
+                availableOrdersPromise,
+            ]);
+
+            const vehicleData = vehicleRes?.data || vehicleRes;
+            const activeOrders = activeOrdersRes?.data || activeOrdersRes || [];
+            const availableOrders = availableOrdersRes?.data || availableOrdersRes || [];
+
+            const defaultVehicle = vehicleData ? {
+                id: vehicleData.id,
+                plateNumber: vehicleData.licensePlate || "Chưa có biển số",
+                vehicleType: vehicleData.vehicleType || "MOTORBIKE",
+                model: vehicleData.brand ? `${vehicleData.brand} (${vehicleData.color || "Tiêu chuẩn"})` : "Phương tiện chính",
+            } : null;
+
+            const isVerifiedVehicle = vehicleData ? Boolean(vehicleData.isVerified) : false;
+
+            return {
+                isOnline,
+                statusText: isOnline ? "Đang hoạt động" : "Offline",
+                activeOrdersCount: Array.isArray(activeOrders) ? activeOrders.length : 0,
+                availableOrdersNearby: Array.isArray(availableOrders) ? availableOrders.length : 0,
+                defaultVehicle,
+                licenseStatus: isVerifiedVehicle ? "APPROVED" : (vehicleData ? "PENDING" : "NONE"),
+                expiryDaysLeft: 365,
+            } as DriverAvailabilityState;
+        },
+        staleTime: 60000,
+        gcTime: 300000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+    });
+
+    useEffect(() => {
+        if (availability?.isOnline) {
+            startLocationTracking();
+        } else {
+            stopLocationTracking();
+        }
+        return () => {
+            stopLocationTracking();
+        };
+    }, [availability?.isOnline, startLocationTracking, stopLocationTracking]);
+
+    useEffect(() => {
+        if (!connection || !isConnected) return;
+
+        const handleDriverStatusChanged = (payload: { isOnline: boolean }) => {
+            // Cập nhật cache Availability
+            queryClient.setQueryData(["driver_availability"], (oldData: any) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    isOnline: payload.isOnline,
+                    statusText: payload.isOnline ? "Đang hoạt động" : "Offline",
+                };
+            });
+
+            // Đồng thời cập nhật luôn cache Dashboard
+            queryClient.setQueryData(["driver_dashboard_stats"], (oldData: any) => {
+                if (!oldData) return oldData;
+                return { ...oldData, isOnline: payload.isOnline };
+            });
+        };
+
+        connection.on("DriverStatusChanged", handleDriverStatusChanged);
+        return () => {
+            connection.off("DriverStatusChanged", handleDriverStatusChanged);
+        };
+    }, [connection, isConnected, queryClient]);
+
     const handleAttemptToggle = (nextStatus: boolean) => {
-        const current = availability
-        if (!current) return
+        const current = availability;
+        if (!current) return;
 
-        // Nếu đang tắt (OFF) mà muốn bật (ON), kiểm tra điều kiện ngay
-        if (nextStatus) {
-            if (!current.defaultVehicle || current.licenseStatus !== "APPROVED") {
-                toast.error("Không thể bật nhận đơn: Thiếu phương tiện hoặc bằng lái chưa hợp lệ!")
-                return
-            }
+        if (nextStatus && (!current.defaultVehicle || current.licenseStatus !== "APPROVED")) {
+            toast.error("Không thể bật nhận đơn: Thiếu phương tiện hoạt động hoặc phương tiện chưa được duyệt!");
+            return;
         }
 
-        // Nếu đang bật (ON) mà muốn tắt (OFF) nhưng đang có đơn chưa hoàn thành -> Cảnh báo
         if (!nextStatus && current.activeOrdersCount > 0) {
-            setPendingToggleValue(false)
-            setShowWarningModal(true)
-            return
+            setPendingToggleValue(false);
+            setShowWarningModal(true);
+            return;
         }
 
-        toggleMutation.mutate(nextStatus)
-    }
+        toggleStatus(nextStatus);
+    };
 
     const confirmForceOffline = () => {
         if (pendingToggleValue !== null) {
-            toggleMutation.mutate(pendingToggleValue)
+            toggleStatus(pendingToggleValue);
         }
-        setShowWarningModal(false)
-        setPendingToggleValue(null)
-    }
+        setShowWarningModal(false);
+        setPendingToggleValue(null);
+    };
 
     return {
         availability,
         isLoading,
-        isToggling: toggleMutation.isPending,
+        isToggling,
         handleAttemptToggle,
         showWarningModal,
         setShowWarningModal,
         confirmForceOffline,
-    }
+    };
 }
