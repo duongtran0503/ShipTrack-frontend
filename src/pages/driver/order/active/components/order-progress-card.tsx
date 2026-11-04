@@ -1,8 +1,10 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ActiveOrderDetailItem } from "@/pages/driver/order/active/hooks/use-active-order-detail";
 import type { ActiveOrderStatus } from "@/pages/driver/order/active/hooks/use-active-orders";
-import { ShieldCheck } from "lucide-react";
+import { useOrderProgressGPS } from "@/pages/driver/order/active/hooks/use-order-progress-gps";
+import { Clock, MapPin, Navigation, ShieldCheck, Truck } from "lucide-react";
 
 interface Props {
     order: ActiveOrderDetailItem;
@@ -14,15 +16,94 @@ interface Props {
 }
 
 export function OrderProgressCard({ order, currentStatus, onPickup, onDeliver, onComplete, onFail }: Props) {
+    const isDelivering = currentStatus === "DELIVERING";
+
+    // Sử dụng hook chuyên biệt để lấy GPS thực & Reverse Geocode VietMap v4
+    const {
+        driverCurrentAddress,
+        isLocating,
+        estimatedDistanceKm,
+        estimatedMinutes,
+    } = useOrderProgressGPS({
+        pickupLat: order.pickupLat,
+        pickupLng: order.pickupLng,
+        tripDistanceKm: order.distanceKm,
+    });
+
     return (
-        <Card className="rounded-[28px] border-border/60 shadow-sm bg-card">
-            <CardHeader className="pb-4 pt-6 px-6 border-b border-border/40">
+        <Card className="rounded-[28px] border-border/60 shadow-sm bg-card overflow-hidden mt-1">
+            <CardHeader className="pb-4 pt-2 px-6 border-b border-border/40 flex flex-row items-center justify-between">
                 <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
                     <ShieldCheck className="size-5 text-primary" />
                     <span>Tiến độ thực hiện đơn hàng</span>
                 </CardTitle>
+                {isDelivering && (
+                    <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border border-amber-500/20 gap-1.5 px-3 py-1 rounded-full font-bold text-xs animate-pulse">
+                        <span className="size-2 rounded-full bg-amber-500 animate-ping" />
+                        Đang di chuyển giao hàng
+                    </Badge>
+                )}
             </CardHeader>
+
             <CardContent className="p-6 space-y-6">
+
+                {/* 🚀 HIỂN THỊ THÔNG TIN CHI TIẾT KHI ĐANG Ở TRẠNG THÁI GIAO HÀNG (DELIVERING) */}
+                {isDelivering && (
+                    <div className="p-5 rounded-[22px] bg-gradient-to-br from-primary/5 via-accent/30 to-background border border-primary/20 space-y-4 shadow-inner">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="relative size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                    <Truck className="size-5 animate-bounce" />
+                                    <span className="absolute -top-1 -right-1 size-3 rounded-full bg-emerald-500 ring-2 ring-card animate-pulse" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-foreground">Hành trình chuyến đi thời gian thực</h4>
+                                    <p className="text-[10px] text-muted-foreground">Đồng bộ GPS thiết bị & VietMap v4</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="px-2.5 py-1 rounded-lg bg-background border border-border/50 text-[11px] font-black text-primary flex items-center gap-1 shadow-sm">
+                                    <Clock className="size-3 text-amber-500" /> ~{estimatedMinutes} phút
+                                </span>
+                                <span className="px-2.5 py-1 rounded-lg bg-background border border-border/50 text-[11px] font-black text-emerald-600 shadow-sm">
+                                    {estimatedDistanceKm} km
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Vị trí hiện tại của tài xế */}
+                        <div className="space-y-1.5 pt-1 border-t border-border/30">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                <Navigation className="size-3 text-primary animate-spin" /> Vị trí hiện tại của tài xế:
+                            </span>
+                            <p className="text-xs font-black text-foreground bg-card/80 p-3 rounded-xl border border-border/40 shadow-sm leading-relaxed">
+                                {isLocating ? "Đang quét định vị GPS..." : driverCurrentAddress}
+                            </p>
+                        </div>
+
+                        {/* Vị trí nhận hàng (Pickup Address) */}
+                        <div className="space-y-1">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                <MapPin className="size-3 text-destructive" /> Vị trí nhận hàng gốc (Pickup):
+                            </span>
+                            <p className="text-xs font-semibold text-muted-foreground line-clamp-1 pl-4">
+                                {order.senderAddress}
+                            </p>
+                        </div>
+
+                        {/* Vị trí nhận hàng (droff Address) */}
+                        <div className="space-y-1">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                <MapPin className="size-3 text-destructive" /> Vị trí nhận giao hàng:
+                            </span>
+                            <p className="text-xs font-semibold text-muted-foreground line-clamp-1 pl-4">
+                                {order.dropoffAddress}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Timeline các bước tiến độ */}
                 <div className="relative pl-6 space-y-8 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-border">
                     {/* Bước 1: DRIVER_ASSIGNED */}
                     <div className="space-y-2 relative">
