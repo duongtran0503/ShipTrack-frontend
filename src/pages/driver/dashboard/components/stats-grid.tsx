@@ -1,5 +1,5 @@
+import type { DriverStats } from "@/pages/driver/dashboard/hooks/use-driver-dashboard";
 import { ArrowRight, CheckCircle2, Package, Star, Wallet } from "lucide-react";
-import type { DriverStats } from "../types";
 import { StatCard } from "./stat-card";
 
 interface Props {
