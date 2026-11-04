@@ -5,43 +5,25 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart";
-import { TrendingUp } from "lucide-react";
+import { Loader2, TrendingUp } from "lucide-react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import type { ChartItemDto } from "../hooks/use-driver-earnings";
 
 interface Props {
     chartTab: "WEEK" | "MONTH";
     setChartTab: (val: "WEEK" | "MONTH") => void;
+    chartData: ChartItemDto[];
+    isLoading: boolean;
 }
-
-// Mock data biểu đồ
-const CHART_DATA = {
-    WEEK: [
-        { label: "T2", income: 320000 },
-        { label: "T3", income: 450000 },
-        { label: "T4", income: 280000 },
-        { label: "T5", income: 600000 },
-        { label: "T6", income: 520000 },
-        { label: "T7", income: 850000 },
-        { label: "CN", income: 750000 },
-    ],
-    MONTH: [
-        { label: "Tuần 1", income: 2450000 },
-        { label: "Tuần 2", income: 3100000 },
-        { label: "Tuần 3", income: 2800000 },
-        { label: "Tuần 4", income: 4200000 },
-    ],
-};
 
 const chartConfig = {
     income: {
         label: "Thu nhập",
-        color: "var(--chart-1)", // Đỏ đô Shiptrack
+        color: "var(--chart-1)",
     },
 } satisfies ChartConfig;
 
-export function EarningsChartCard({ chartTab, setChartTab }: Props) {
-    const data = CHART_DATA[chartTab];
-
+export function EarningsChartCard({ chartTab, setChartTab, chartData, isLoading }: Props) {
     return (
         <Card className="rounded-[28px] border-border/60 shadow-sm bg-card overflow-hidden">
             <CardHeader className="pb-4 pt-6 px-6 border-b border-border/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -67,37 +49,44 @@ export function EarningsChartCard({ chartTab, setChartTab }: Props) {
                 </div>
             </CardHeader>
             <CardContent className="p-6">
-                <ChartContainer config={chartConfig} className="w-full h-[280px]">
-                    <LineChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.3} />
-                        <XAxis
-                            dataKey="label"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={10}
-                            className="text-xs font-semibold fill-muted-foreground"
-                        />
-                        <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={10}
-                            tickFormatter={(value) => `${value / 1000}k`}
-                            className="text-xs font-semibold fill-muted-foreground"
-                        />
-                        <ChartTooltip
-                            cursor={{ stroke: "var(--muted)", strokeWidth: 2 }}
-                            content={<ChartTooltipContent indicator="line" className="rounded-2xl shadow-xl border-border/60 bg-card p-3" />}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="income"
-                            stroke="var(--color-income)"
-                            strokeWidth={3}
-                            dot={{ r: 4, fill: "var(--color-income)", strokeWidth: 2, stroke: "var(--background)" }}
-                            activeDot={{ r: 6, strokeWidth: 0 }}
-                        />
-                    </LineChart>
-                </ChartContainer>
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-[280px] w-full text-xs text-muted-foreground">
+                        <Loader2 className="size-5 animate-spin text-primary mr-2" />
+                        Đang tải biểu đồ...
+                    </div>
+                ) : (
+                    <ChartContainer config={chartConfig} className="w-full h-[280px]">
+                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                            <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.3} />
+                            <XAxis
+                                dataKey="label"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={10}
+                                className="text-xs font-semibold fill-muted-foreground"
+                            />
+                            <YAxis
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={10}
+                                tickFormatter={(value) => `${value >= 1000 ? `${value / 1000}k` : value}`}
+                                className="text-xs font-semibold fill-muted-foreground"
+                            />
+                            <ChartTooltip
+                                cursor={{ stroke: "var(--muted)", strokeWidth: 2 }}
+                                content={<ChartTooltipContent indicator="line" className="rounded-2xl shadow-xl border-border/60 bg-card p-3" />}
+                            />
+                            <Line
+                                type="monotone"
+                                dataKey="income"
+                                stroke="var(--color-income)"
+                                strokeWidth={3}
+                                dot={{ r: 4, fill: "var(--color-income)", strokeWidth: 2, stroke: "var(--background)" }}
+                                activeDot={{ r: 6, strokeWidth: 0 }}
+                            />
+                        </LineChart>
+                    </ChartContainer>
+                )}
             </CardContent>
         </Card>
     );

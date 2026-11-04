@@ -1,5 +1,7 @@
+import { apiClient } from "@/lib/config/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export interface EarningItem {
     id: string;
@@ -8,63 +10,92 @@ export interface EarningItem {
     shippingFee: number;
     driverBonus: number;
     platformCommission: number;
-    netIncome: number; // Thực nhận
+    netIncome: number;
     paymentMethod: "CASH" | "BANK_TRANSFER";
 }
 
-export function useDriverEarnings() {
-    const [timeRange, setTimeRange] = useState<"TODAY" | "THIS_WEEK" | "THIS_MONTH">("THIS_MONTH")
-    const [chartTab, setChartTab] = useState<"WEEK" | "MONTH">("WEEK")
+export interface EarningsSummary {
+    today: number;
+    thisWeek: number;
+    thisMonth: number;
+    pendingWithdrawal: number;
+}
 
-    // Mock dữ liệu thu nhập
-    const { data, isLoading } = useQuery({
-        queryKey: ["driver_earnings_data", timeRange],
+export interface DriverEarningsData {
+    summary: EarningsSummary;
+    earningsList: EarningItem[];
+    pagination: {
+        page: number;
+        size: number;
+        totalElements: number;
+        totalPages: number;
+    };
+}
+
+export interface ChartItemDto {
+    label: string;
+    income: number;
+}
+
+export interface EarningsChartResponse {
+    period: string;
+    chartData: ChartItemDto[];
+}
+
+export function useDriverEarnings() {
+    const [timeRange, setTimeRange] = useState<"TODAY" | "THIS_WEEK" | "THIS_MONTH">("THIS_MONTH");
+    const [chartTab, setChartTab] = useState<"WEEK" | "MONTH">("WEEK");
+    const [page, setPage] = useState<number>(0);
+    const [size] = useState<number>(10);
+    const [paymentMethod, setPaymentMethod] = useState<string | undefined>(undefined);
+
+    // 1. Query danh sách thu nhập và tổng quan
+    const { data, isLoading, refetch } = useQuery({
+        queryKey: ["driver_earnings_data", timeRange, page, size, paymentMethod],
         queryFn: async () => {
-            await new Promise((r) => setTimeout(r, 350))
-            return {
-                summary: {
-                    today: 320000,
-                    thisWeek: 2450000,
-                    thisMonth: 10850000,
-                    pendingWithdrawal: 1250000,
+            const response = await apiClient.get("/drivers/me/earnings", {
+                params: {
+                    range: timeRange,
+                    page,
+                    size,
+                    paymentMethod: paymentMethod || undefined,
                 },
-                earningsList: [
-                    {
-                        id: "earn_01",
-                        trackingCode: "ST-7712",
-                        completedAt: "20/10/2024 14:30",
-                        shippingFee: 45000,
-                        driverBonus: 10000,
-                        platformCommission: 9000,
-                        netIncome: 46000,
-                        paymentMethod: "CASH",
-                    },
-                    {
-                        id: "earn_02",
-                        trackingCode: "ST-7720",
-                        completedAt: "18/10/2024 09:10",
-                        shippingFee: 65000,
-                        driverBonus: 15000,
-                        platformCommission: 13000,
-                        netIncome: 67000,
-                        paymentMethod: "BANK_TRANSFER",
-                    },
-                ] as EarningItem[],
-            }
+            });
+            return (response?.data || response) as DriverEarningsData;
         },
-    })
+        staleTime: 30000,
+    });
+
+    // 2. Query dữ liệu biểu đồ từ API thực tế /drivers/me/earnings/chart
+    const { data: chartResponse, isLoading: isChartLoading } = useQuery({
+        queryKey: ["driver_earnings_chart", chartTab],
+        queryFn: async () => {
+            const response = await apiClient.get("/drivers/me/earnings/chart", {
+                params: { period: chartTab },
+            });
+            console.log(response, "sldjflaskdfjl")
+            return response as unknown as EarningsChartResponse;
+        },
+        staleTime: 30000,
+    });
 
     const handleExportReport = (type: "EXCEL" | "PDF") => {
-        alert(`Đang tiến hành xuất báo cáo thu nhập dạng ${type}... Vui lòng đợi trong giây lát.`)
-    }
+        toast.info(`Tính năng xuất báo cáo ${type} đang được phát triển.`);
+    };
 
     return {
         data,
         isLoading,
+        chartData: chartResponse?.chartData || [],
+        isChartLoading,
         timeRange,
         setTimeRange,
         chartTab,
         setChartTab,
+        page,
+        setPage,
+        setPaymentMethod,
+        refetchEarnings: refetch,
         handleExportReport,
-    }
+    };
 }

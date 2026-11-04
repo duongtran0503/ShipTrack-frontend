@@ -9,6 +9,8 @@ export default function DriverEarningsPage() {
     const {
         data,
         isLoading,
+        chartData,
+        isChartLoading,
         timeRange,
         setTimeRange,
         chartTab,
@@ -34,7 +36,12 @@ export default function DriverEarningsPage() {
             <EarningsKpiCards summary={data.summary} />
 
             {/* Chart */}
-            <EarningsChartCard chartTab={chartTab} setChartTab={setChartTab} />
+            <EarningsChartCard
+                chartTab={chartTab}
+                setChartTab={setChartTab}
+                chartData={chartData}
+                isLoading={isChartLoading}
+            />
 
             {/* List */}
             <EarningsList
