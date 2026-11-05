@@ -5,6 +5,13 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
+export interface DriverStats {
+    activeOrdersCount: number;
+    completedTodayCount: number;
+    todayEarnings: number;
+    averageRating: number;
+    isOnline: boolean;
+}
 export interface DriverDashboardStats {
     activeOrdersCount: number;
     completedTodayCount: number;
