@@ -1,4 +1,34 @@
-import Dashboard from "@/pages/manager/dashboard"
+import AdminDashboardPage from "@/pages/manager/dashboard"
+import AdminDriversPage from "@/pages/manager/driver"
+import AdminDriverApprovalsPage from "@/pages/manager/driver/approvals"
+import AdminDriverDetailPage from "@/pages/manager/driver/detail"
+import AdminDriversMapPage from "@/pages/manager/driver/map"
+import AdminOnlineDriversPage from "@/pages/manager/driver/online"
+import AdminReviewsPage from "@/pages/manager/manager-review"
+import AdminReviewDetailPage from "@/pages/manager/manager-review/detail"
+import AdminOrdersPage from "@/pages/manager/order"
+import AdminOrderCancelledPage from "@/pages/manager/order/cancelled"
+import AdminOrderCompletedPage from "@/pages/manager/order/completed"
+import AdminOrderDeliveringPage from "@/pages/manager/order/delivering"
+import AdminOrderDetailPage from "@/pages/manager/order/detaill"
+import AdminOrdersWaitingDriverPage from "@/pages/manager/order/waiting-for-driver"
+import AdminDriverPerformancePage from "@/pages/manager/reports/drivers"
+import AdminOrderReportsPage from "@/pages/manager/reports/orders"
+import AdminRevenueReportPage from "@/pages/manager/reports/revenue"
+import AdminReviewsReportPage from "@/pages/manager/reports/reviews"
+import AdminSystemLogsPage from "@/pages/manager/settings/logs"
+import AdminNotificationSettingsPage from "@/pages/manager/settings/notifications"
+import AdminRadiusSettingsPage from "@/pages/manager/settings/radius"
+import AdminShippingFeeSettingsPage from "@/pages/manager/settings/shipping-fee"
+import AdminTimeoutSettingsPage from "@/pages/manager/settings/timeout"
+import AdminTrackingHistoryPage from "@/pages/manager/tracking/history"
+import AdminLiveMapPage from "@/pages/manager/tracking/live-map"
+import AdminUsersPage from "@/pages/manager/user"
+import AdminBannedUsersPage from "@/pages/manager/user/banned"
+import AdminUserDetailPageRoute from "@/pages/manager/user/detail"
+import AdminVehiclesPage from "@/pages/manager/vehicles"
+import AdminVehicleApprovalsPage from "@/pages/manager/vehicles/approval"
+import AdminVehicleDetailPage from "@/pages/manager/vehicles/detail"
 import UnderDevelopment from "@/routes/UnderDevelopment"
 import { Navigate, type RouteObject } from "react-router"
 
@@ -15,34 +45,28 @@ export const adminRoutes: RouteObject[] = [
             },
             {
                 path: "dashboard",
-                element: <Dashboard />,
+                element: <AdminDashboardPage />,
             },
 
             // ==================== NHÓM 1: QUẢN LÝ NGƯỜI DÙNG ====================
             {
                 path: "users",
                 element: (
-                    <UnderDevelopment
-                        title="Quản lý người dùng"
-                        description="Danh sách toàn bộ tài khoản Khách hàng và Tài xế: thông tin liên hệ, lịch sử đặt hàng và trạng thái hoạt động."
+                    <AdminUsersPage
                     />
                 ),
             },
             {
-                path: "users/customers",
+                path: "users/:id",
                 element: (
-                    <UnderDevelopment
-                        title="Quản lý khách hàng"
-                        description="Danh sách khách hàng đang hoạt động, thống kê số đơn đã đặt, tổng chi tiêu và mức độ trung thành."
+                    <AdminUserDetailPageRoute
                     />
                 ),
             },
             {
                 path: "users/banned",
                 element: (
-                    <UnderDevelopment
-                        title="Tài khoản bị khóa"
-                        description="Danh sách người dùng bị đình chỉ hoặc khóa vĩnh viễn do vi phạm chính sách, gian lận hoặc spam đơn hàng."
+                    <AdminBannedUsersPage
                     />
                 ),
             },
@@ -51,36 +75,36 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "drivers",
                 element: (
-                    <UnderDevelopment
-                        title="Danh sách tài xế"
-                        description="Quản lý toàn bộ đội ngũ tài xế: thông tin cá nhân, phương tiện, trạng thái online/offline và hiệu suất giao hàng."
+                    <AdminDriversPage
                     />
                 ),
             },
             {
+                path: "drivers/:id",
+                element: (
+                    <AdminDriverDetailPage
+                    />
+                ),
+            },
+
+            {
                 path: "drivers/approvals",
                 element: (
-                    <UnderDevelopment
-                        title="Phê duyệt hồ sơ tài xế mới"
-                        description="Xác minh CCCD, bằng lái xe, giấy tờ phương tiện và lý lịch của ứng viên đăng ký làm tài xế giao hàng."
+                    <AdminDriverApprovalsPage
                     />
                 ),
             },
             {
                 path: "drivers/online",
                 element: (
-                    <UnderDevelopment
-                        title="Tài xế đang trực tuyến"
-                        description="Theo dõi real-time danh sách tài xế đang online, vị trí GPS hiện tại và trạng thái nhận đơn."
+                    <AdminOnlineDriversPage
                     />
                 ),
             },
             {
                 path: "drivers/map",
                 element: (
-                    <UnderDevelopment
-                        title="Bản đồ vị trí tài xế"
-                        description="Giám sát vị trí real-time của tất cả tài xế đang hoạt động trên bản đồ Leaflet + OSRM."
+                    <AdminDriversMapPage
                     />
                 ),
             },
@@ -89,18 +113,21 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "vehicles",
                 element: (
-                    <UnderDevelopment
-                        title="Quản lý phương tiện"
-                        description="Tra cứu danh sách xe đã đăng ký: biển số, loại xe, tải trọng và tình trạng giấy tờ."
+                    <AdminVehiclesPage
                     />
                 ),
             },
             {
                 path: "vehicles/approvals",
                 element: (
-                    <UnderDevelopment
-                        title="Phê duyệt đăng ký phương tiện"
-                        description="Kiểm tra giấy đăng ký xe, bảo hiểm và tiêu chuẩn an toàn trước khi cho phép tài xế sử dụng."
+                    <AdminVehicleApprovalsPage
+                    />
+                ),
+            },
+            {
+                path: "vehicles/:id",
+                element: (
+                    <AdminVehicleDetailPage
                     />
                 ),
             },
@@ -109,45 +136,49 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "orders",
                 element: (
-                    <UnderDevelopment
-                        title="Danh sách đơn hàng toàn hệ thống"
-                        description="Bộ lọc tra cứu toàn bộ đơn hàng: trạng thái, tuyến đường, tài xế phụ trách, thời gian giao và chi phí vận chuyển."
+                    <AdminOrdersPage
+                    />
+                ),
+            },
+            {
+                path: "orders/:id",
+                element: (
+                    <AdminOrderDetailPage
                     />
                 ),
             },
             {
                 path: "orders/pending",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn hàng chờ tài xế"
-                        description="Hàng đợi các đơn hàng vừa được tạo đang chờ hệ thống điều phối hoặc tài xế nhận giao."
+                    <AdminOrdersWaitingDriverPage
                     />
                 ),
             },
             {
                 path: "orders/active",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn hàng đang giao"
-                        description="Theo dõi các đơn hàng đang trên đường vận chuyển, cập nhật vị trí tài xế và tiến độ giao hàng real-time."
+                    <AdminOrderDeliveringPage
                     />
                 ),
             },
             {
                 path: "orders/completed",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn hàng đã hoàn thành"
-                        description="Lịch sử các đơn hàng đã giao thành công, bao gồm ảnh xác nhận, chữ ký điện tử và đánh giá từ khách hàng."
+                    <AdminOrderCompletedPage
                     />
                 ),
             },
             {
                 path: "orders/cancelled",
                 element: (
-                    <UnderDevelopment
-                        title="Đơn hàng đã hủy"
-                        description="Danh sách các đơn hàng bị hủy bởi khách hàng, tài xế hoặc hệ thống, kèm lý do và trạng thái hoàn tiền."
+                    <AdminOrderCancelledPage
+                    />
+                ),
+            },
+            {
+                path: "orders/failed",
+                element: (
+                    <AdminOrderCancelledPage
                     />
                 ),
             },
@@ -156,18 +187,14 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "tracking",
                 element: (
-                    <UnderDevelopment
-                        title="Lịch sử hành trình giao hàng"
-                        description="Xem lại toàn bộ lộ trình di chuyển của tài xế theo thời gian, tốc độ trung bình và các điểm dừng trên tuyến."
-                    />
+                    <AdminTrackingHistoryPage />
+
                 ),
             },
             {
                 path: "tracking/live-map",
                 element: (
-                    <UnderDevelopment
-                        title="Bản đồ theo dõi trực tiếp"
-                        description="Bản đồ real-time qua SignalR: hiển thị vị trí tài xế, đơn đang giao và tuyến đường tối ưu trên Leaflet + OSRM."
+                    <AdminLiveMapPage
                     />
                 ),
             },
@@ -185,36 +212,28 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "reports/orders",
                 element: (
-                    <UnderDevelopment
-                        title="Thống kê vòng đời đơn hàng"
-                        description="Phân tích tỷ lệ đơn hoàn thành, hủy, tranh chấp và thời gian trung bình từ lúc tạo đến khi giao xong."
+                    <AdminOrderReportsPage
                     />
                 ),
             },
             {
                 path: "reports/revenue",
                 element: (
-                    <UnderDevelopment
-                        title="Thống kê doanh thu hệ thống"
-                        description="Phân tích nguồn thu từ phí vận chuyển, hoa hồng đơn hàng và các khoản phí dịch vụ khác theo ngày/tuần/tháng."
+                    <AdminRevenueReportPage
                     />
                 ),
             },
             {
                 path: "reports/drivers",
                 element: (
-                    <UnderDevelopment
-                        title="Hiệu suất đội ngũ tài xế"
-                        description="Bảng xếp hạng tài xế theo số đơn hoàn thành, tỷ lệ đúng giờ, đánh giá từ khách hàng và thời gian online."
+                    <AdminDriverPerformancePage
                     />
                 ),
             },
             {
                 path: "reports/reviews",
                 element: (
-                    <UnderDevelopment
-                        title="Báo cáo đánh giá"
-                        description="Thống kê đánh giá, tỷ lệ hài lòng, các đánh giá tiêu cực và xu hướng chất lượng dịch vụ theo thời gian."
+                    <AdminReviewsReportPage
                     />
                 ),
             },
@@ -223,9 +242,14 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "reviews",
                 element: (
-                    <UnderDevelopment
-                        title="Quản lý đánh giá"
-                        description="Xem tất cả đánh giá của khách hàng về tài xế, xóa đánh giá vi phạm và gửi phản hồi chính thức từ hệ thống."
+                    <AdminReviewsPage
+                    />
+                ),
+            },
+            {
+                path: "reviews/:id",
+                element: (
+                    <AdminReviewDetailPage
                     />
                 ),
             },
@@ -243,45 +267,38 @@ export const adminRoutes: RouteObject[] = [
             {
                 path: "settings/shipping-fee",
                 element: (
-                    <UnderDevelopment
-                        title="Cấu hình phí vận chuyển"
-                        description="Thiết lập phí theo km, theo loại xe và các phụ phí (giờ cao điểm, khu vực xa, hàng cồng kềnh)."
+                    <AdminShippingFeeSettingsPage
                     />
                 ),
             },
             {
                 path: "settings/radius",
                 element: (
-                    <UnderDevelopment
-                        title="Cấu hình bán kính tìm tài xế"
-                        description="Bán kính tối đa để hệ thống tìm tài xế gần nhất khi có đơn hàng mới cần điều phối."
+                    <AdminRadiusSettingsPage
                     />
                 ),
             },
             {
                 path: "settings/timeout",
                 element: (
-                    <UnderDevelopment
-                        title="Cấu hình thời gian timeout"
-                        description="Thời gian chờ tài xế nhận đơn, thời gian giao hàng tối đa và thời gian tự động hủy đơn khi quá hạn."
+                    <AdminTimeoutSettingsPage
+
                     />
                 ),
             },
             {
                 path: "settings/notifications",
                 element: (
-                    <UnderDevelopment
-                        title="Cấu hình thông báo hệ thống"
-                        description="Bật/tắt và tùy chỉnh mẫu thông báo push, email, SMS gửi đến khách hàng và tài xế trong từng sự kiện đơn hàng."
+                    <AdminNotificationSettingsPage
+
                     />
                 ),
             },
             {
                 path: "settings/logs",
                 element: (
-                    <UnderDevelopment
-                        title="Nhật ký hoạt động hệ thống"
-                        description="Audit log ghi lại toàn bộ hành động của quản trị viên: đăng nhập, thay đổi cấu hình, khóa tài khoản và xuất dữ liệu."
+                    <AdminSystemLogsPage
+
                     />
                 ),
             },

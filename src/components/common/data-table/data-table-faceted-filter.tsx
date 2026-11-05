@@ -37,7 +37,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   const selectedValues = new Set(filterValue ?? [])
   return (
     <Popover>
-      <PopoverTrigger >
+      <PopoverTrigger  >
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircledIcon className="mr-2 size-4" />
           {title}

@@ -31,13 +31,13 @@ export const ADMIN_NAV_ITEMS: NavItemType[] = [
         href: "/manager/users",
         listUrl: [
             "/manager/users",
-            "/manager/users/customers",
+            // "/manager/users/customers",
             "/manager/users/banned",
             "/manager/users/:id",
         ],
         children: [
             { label: "Tất cả người dùng", href: "/manager/users" },           // 1.1
-            { label: "Khách hàng", href: "/manager/users/customers" },        // 1.1
+            // { label: "Khách hàng", href: "/manager/users/customers" },        // 1.1
             { label: "Tài khoản bị khóa", href: "/manager/users/banned" },    // 1.5
         ],
         // Chức năng nhóm 1: Xem danh sách, chi tiết, tạo, cập nhật, khóa/mở khóa, reset mật khẩu
@@ -95,6 +95,7 @@ export const ADMIN_NAV_ITEMS: NavItemType[] = [
             "/manager/orders/active",
             "/manager/orders/completed",
             "/manager/orders/cancelled",
+            "/manager/orders/failed",
             "/manager/orders/:id",
         ],
         children: [
@@ -103,6 +104,7 @@ export const ADMIN_NAV_ITEMS: NavItemType[] = [
             { label: "Đang giao", href: "/manager/orders/active" },           // 4.1
             { label: "Hoàn thành", href: "/manager/orders/completed" },       // 4.1
             { label: "Đã hủy", href: "/manager/orders/cancelled" },           // 4.1
+            { label: "Giao hàng thất bại", href: "/manager/orders/failed" },           // 4.1
         ],
         // Chức năng nhóm 4: Xem tất cả, chi tiết, tìm kiếm, hủy, gán/đổi tài xế, gia hạn, lịch sử, real-time
     },
