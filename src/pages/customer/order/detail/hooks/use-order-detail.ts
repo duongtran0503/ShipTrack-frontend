@@ -25,6 +25,7 @@ export function useOrderDetail() {
 
     // Map dữ liệu trả về từ backend thành format mà các component con đang sử dụng
     const rawOrder = responseData?.data
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const order = rawOrder ? {
         id: String(rawOrder.id),
@@ -53,14 +54,22 @@ export function useOrderDetail() {
         distanceKm: rawOrder.distanceKm,
         status: rawOrder.status,
         createdAt: rawOrder.createdAtUtc ? rawOrder.createdAtUtc.replace("T", " ").substring(0, 16) : "",
-        driverName: rawOrder.driver || undefined,
-        driverPhone: rawOrder.driverPhone || undefined,
+
+        // Trích xuất thông tin tài xế an toàn từ object hoặc string
+        driverName: typeof rawOrder.driver === "object" && rawOrder.driver !== null
+            ? (rawOrder.driver as any).name
+            : (rawOrder.driver || undefined),
+        driverPhone: typeof rawOrder.driver === "object" && rawOrder.driver !== null
+            ? (rawOrder.driver as any).phone
+            : (rawOrder.driverPhone || undefined),
+        driverLicensePlate: typeof rawOrder.driver === "object" && rawOrder.driver !== null
+            ? (rawOrder.driver as any).licensePlate
+            : undefined,
     } : null
 
     // ==================== MUTATION (HỦY ĐƠN HÀNG) ====================
     const cancelOrderMutation = useMutation({
         mutationFn: async () => {
-            // Nếu backend có API hủy đơn, thay thế ở đây. Ví dụ: await orderApi.cancelOrder(id!)
             await new Promise((resolve) => setTimeout(resolve, 600))
         },
         onSuccess: () => {
@@ -100,18 +109,12 @@ export function useOrderDetail() {
         cancelOrderMutation.mutate()
     }
 
-    // ==================== RETURN ====================
     return {
-        // Data
         order,
         isLoading,
-
-        // Derived
         timelineSteps,
         canCancel,
         isDelivering,
-
-        // Cancel dialog
         isCancelDialogOpen,
         setIsCancelDialogOpen,
         cancelReason,
@@ -120,8 +123,6 @@ export function useOrderDetail() {
         setCancelNote,
         isCancelling: cancelOrderMutation.isPending,
         handleCancel,
-
-        // Navigation
         goBack,
         goToTracking,
     }
