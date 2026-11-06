@@ -12,13 +12,20 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import DriverRatingDialog from "@/pages/customer/order/detail/components/driver-rating-dialog"
+import { toast } from "sonner"
 
 interface Props {
     order: any
 }
 
 export function OrderDriverCard({ order }: Props) {
-    const hasDriver = Boolean(order?.driverName)
+    // Xác định xem đã có tài xế hoặc đơn đã qua giai đoạn tìm kiếm chưa
+    const hasAssignedDriver =
+        Boolean(order?.driverName) ||
+        order?.status === "DRIVER_ASSIGNED" ||
+        order?.status === "PICKED_UP" ||
+        order?.status === "DELIVERING" ||
+        order?.status === "COMPLETED"
 
     return (
         <Card className="rounded-3xl border-border/60 shadow-md">
@@ -30,20 +37,20 @@ export function OrderDriverCard({ order }: Props) {
             </CardHeader>
 
             <CardContent className="p-5 space-y-4">
-                {hasDriver ? (
+                {hasAssignedDriver ? (
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <Avatar className="size-12 border-2 border-primary/20">
                                 <AvatarFallback className="bg-primary text-white font-bold">
-                                    {order.driverName.charAt(0)}
+                                    {order.driverName ? order.driverName.charAt(0) : "T"}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="space-y-0.5">
                                 <h3 className="text-sm font-bold text-foreground">
-                                    {order.driverName}
+                                    {order.driverName || "Tài xế hệ thống"}
                                 </h3>
                                 <p className="text-xs text-muted-foreground font-medium">
-                                    SĐT: {order.driverPhone || "---"}
+                                    SĐT: {order.driverPhone || "Đang cập nhật..."}
                                 </p>
                                 <div className="flex items-center gap-1 text-xs text-amber-500 font-semibold pt-0.5">
                                     <Star className="size-3.5 fill-amber-500" />
@@ -54,7 +61,7 @@ export function OrderDriverCard({ order }: Props) {
 
                         <div className="p-3.5 rounded-2xl bg-muted/40 text-xs space-y-2 border border-border/50">
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Loại phương tiện:</span>
+                                <span className="text-muted-foreground">Phương tiện:</span>
                                 <span className="font-bold">{order.vehicleType || "Xe máy giao hàng"}</span>
                             </div>
                             <div className="flex justify-between">
@@ -81,9 +88,11 @@ export function OrderDriverCard({ order }: Props) {
                             onClick={() => {
                                 if (order.driverPhone) {
                                     window.location.href = `tel:${order.driverPhone}`
+                                } else {
+                                    toast.error("Số điện thoại tài xế đang cập nhật")
                                 }
                             }}
-                            className="w-full rounded-2xl gap-2 font-bold text-xs h-10 border-primary/30 text-primary bg-primary/10 hover:bg-primary/20"
+                            className="w-full rounded-2xl gap-2 font-bold text-xs h-10 border-primary/30 text-primary bg-primary/10 hover:bg-primary/20 cursor-pointer"
                         >
                             <PhoneCall className="size-3.5" />
                             <span>Gọi điện cho tài xế</span>

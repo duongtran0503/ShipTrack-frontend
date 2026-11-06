@@ -1,74 +1,85 @@
-import type { OrderItem } from "@/demo_data_services/mockOrderService"
-
 export interface TimelineStep {
-    status: OrderItem["status"]
-    title: string
-    description: string
-    time?: string
-    completed: boolean
-    current: boolean
+    title: string;
+    description: string;
+    time?: string;
+    completed: boolean;
+    current: boolean;
 }
 
-export function buildTimeline(order: OrderItem): TimelineStep[] {
-    const isCancelled = order.status === "CANCELLED"
+export function buildTimeline(order: { status: string; createdAt?: string }): TimelineStep[] {
+    const status = order.status;
 
-    if (isCancelled) {
+    // Danh sách các mốc trạng thái chuẩn của hệ thống Shiptrack
+    const stepsConfig = [
+        {
+            key: "PENDING",
+            title: "Khởi tạo đơn hàng",
+            description: "Đơn hàng đã được tạo thành công trên hệ thống và đang chờ xử lý.",
+        },
+        {
+            key: "SEARCHING_DRIVER",
+            title: "Đang tìm tài xế",
+            description: "Hệ thống đang tự động tìm kiếm và phân công tài xế ở khu vực gần nhất.",
+        },
+        {
+            key: "DRIVER_ASSIGNED",
+            title: "Tài xế đã nhận đơn",
+            description: "Tài xế đã xác nhận nhận đơn hàng và đang di chuyển đến điểm lấy hàng.",
+        },
+        {
+            key: "PICKED_UP",
+            title: "Đã lấy hàng thành công",
+            description: "Tài xế đã nhận bưu phẩm từ người gửi và bắt đầu hành trình giao hàng.",
+        },
+        {
+            key: "DELIVERING",
+            title: "Đang giao hàng",
+            description: "Tài xế đang vận chuyển đơn hàng đến địa chỉ của người nhận.",
+        },
+        {
+            key: "COMPLETED",
+            title: "Đã hoàn thành",
+            description: "Đơn hàng đã được giao thành công cho người nhận.",
+        },
+    ];
+
+    // Xử lý đặc biệt cho các trạng thái kết thúc bất thường (Hủy hoặc Thất bại)
+    if (status === "CANCELLED" || status === "FAILED") {
+        const isCancelled = status === "CANCELLED";
         return [
             {
-                status: "PENDING",
                 title: "Khởi tạo đơn hàng",
-                description: "Đơn hàng đã được tạo thành công",
-                time: order.createdAt,
+                description: "Đơn hàng đã được khởi tạo.",
                 completed: true,
                 current: false,
             },
             {
-                status: "CANCELLED",
-                title: "Đơn hàng đã bị hủy",
-                description: "Đơn hàng đã hủy bởi khách hàng",
-                time: "Vừa xong",
-                completed: true,
+                title: isCancelled ? "Đơn hàng đã bị hủy" : "Giao hàng thất bại",
+                description: isCancelled
+                    ? "Đơn hàng đã bị hủy bỏ bởi người dùng hoặc hệ thống."
+                    : "Tài xế không thể hoàn tất việc giao hàng.",
+                completed: false,
                 current: true,
+                time: order.createdAt,
             },
-        ]
+        ];
     }
 
-    return [
-        {
-            status: "PENDING",
-            title: "Tạo đơn hàng",
-            description: "Hệ thống ghi nhận đơn hàng",
-            time: order.createdAt,
-            completed: true,
-            current: order.status === "PENDING",
-        },
-        {
-            status: "SEARCHING_DRIVER",
-            title: "Đang tìm tài xế",
-            description: "Phát đơn cho tài xế gần nhất",
-            time: order.status !== "PENDING" ? "Hệ thống tự động" : undefined,
-            completed: order.status !== "PENDING",
-            current: order.status === "SEARCHING_DRIVER",
-        },
-        {
-            status: "DELIVERING",
-            title: "Đang giao hàng",
-            description: "Tài xế đang vận chuyển kiện hàng",
-            time:
-                order.status === "DELIVERING" || order.status === "COMPLETED"
-                    ? "Đã lấy hàng"
-                    : undefined,
-            completed:
-                order.status === "DELIVERING" || order.status === "COMPLETED",
-            current: order.status === "DELIVERING",
-        },
-        {
-            status: "COMPLETED",
-            title: "Giao hàng thành công",
-            description: "Khách hàng đã nhận hàng thành công",
-            time: order.status === "COMPLETED" ? "Hoàn thành" : undefined,
-            completed: order.status === "COMPLETED",
-            current: order.status === "COMPLETED",
-        },
-    ]
+    // Thứ tự ưu tiên của các trạng thái bình thường
+    const statusOrder = ["PENDING", "SEARCHING_DRIVER", "DRIVER_ASSIGNED", "PICKED_UP", "DELIVERING", "COMPLETED"];
+    const currentIndex = statusOrder.indexOf(status);
+
+    return stepsConfig.map((step,) => {
+        const stepIndex = statusOrder.indexOf(step.key);
+        const isCompleted = stepIndex < currentIndex || (status === "COMPLETED" && step.key === "COMPLETED");
+        const isCurrent = step.key === status;
+
+        return {
+            title: step.title,
+            description: step.description,
+            completed: isCompleted,
+            current: isCurrent,
+            time: isCurrent || isCompleted ? order.createdAt : undefined,
+        };
+    });
 }

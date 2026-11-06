@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { toast } from "sonner"
 
+import { getSignalRConnection, startSignalRConnection } from "@/lib/signalR/signalr-hub"
 import { buildTimeline } from "@/pages/customer/order/detail/helpers/order-timeline"
 import { orderApi } from "@/services/order/order-api"
 
@@ -23,7 +24,52 @@ export function useOrderDetail() {
         enabled: !!id,
     })
 
-    // Map dữ liệu trả về từ backend thành format mà các component con đang sử dụng
+    // ==================== SIGNALR REAL-TIME LISTENER ====================
+    useEffect(() => {
+        if (!id) return
+
+        const connection = getSignalRConnection()
+
+        const setupSignalR = async () => {
+            await startSignalRConnection()
+
+            try {
+                if (connection.state === "Connected") {
+                    await connection.invoke("JoinOrderGroup", Number(id))
+                }
+            } catch (err) {
+                console.error("Error joining order group:", err)
+            }
+
+            connection.on("OrderStatusChanged", (updatedOrderPayload: any) => {
+                if (updatedOrderPayload && String(updatedOrderPayload.id) === String(id)) {
+                    queryClient.setQueryData(["customer_order_detail", id], (oldData: any) => {
+                        if (!oldData) return oldData
+                        return {
+                            ...oldData,
+                            data: {
+                                ...oldData.data,
+                                ...updatedOrderPayload,
+                            },
+                        }
+                    })
+
+                    queryClient.invalidateQueries({ queryKey: ["customer_order_detail", id] })
+                }
+            })
+        }
+
+        setupSignalR()
+
+        return () => {
+            if (connection) {
+                connection.invoke("LeaveOrderGroup", Number(id)).catch(() => { })
+                connection.off("OrderStatusChanged")
+            }
+        }
+    }, [id, queryClient])
+
+    // ==================== MAP DỮ LIỆU TỪ BACKEND ====================
     const rawOrder = responseData?.data
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,16 +101,16 @@ export function useOrderDetail() {
         status: rawOrder.status,
         createdAt: rawOrder.createdAtUtc ? rawOrder.createdAtUtc.replace("T", " ").substring(0, 16) : "",
 
-        // Trích xuất thông tin tài xế an toàn từ object hoặc string
+        // Trích xuất thông tin tài xế an toàn
         driverName: typeof rawOrder.driver === "object" && rawOrder.driver !== null
             ? (rawOrder.driver as any).name
-            : (rawOrder.driver || undefined),
+            : (rawOrder.driver || rawOrder.driverName || undefined),
         driverPhone: typeof rawOrder.driver === "object" && rawOrder.driver !== null
             ? (rawOrder.driver as any).phone
             : (rawOrder.driverPhone || undefined),
         driverLicensePlate: typeof rawOrder.driver === "object" && rawOrder.driver !== null
             ? (rawOrder.driver as any).licensePlate
-            : undefined,
+            : (rawOrder.driverLicensePlate || undefined),
     } : null
 
     // ==================== MUTATION (HỦY ĐƠN HÀNG) ====================
@@ -90,10 +136,15 @@ export function useOrderDetail() {
         [order]
     )
 
+    // Mở rộng các trạng thái cho phép hủy đơn
     const canCancel =
         order?.status === "PENDING" || order?.status === "SEARCHING_DRIVER"
 
-    const isDelivering = order?.status === "DELIVERING"
+    // Mở rộng nhận diện trạng thái đang thực hiện giao hàng
+    const isDelivering =
+        order?.status === "DRIVER_ASSIGNED" ||
+        order?.status === "PICKED_UP" ||
+        order?.status === "DELIVERING"
 
     // ==================== HANDLERS ====================
     const goBack = () => navigate("/customer/orders")
