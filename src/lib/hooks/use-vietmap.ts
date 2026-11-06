@@ -28,7 +28,7 @@ export function useVietmap(inputValue: string = "", userLocation?: LatLng) {
     const [isLoading, setIsLoading] = useState(false)
 
     // 1. Debounce giá trị input (chờ 500ms sau khi ngừng gõ mới bắt đầu search)
-    const debouncedInput = useDebounce(inputValue, 2000)
+    const debouncedInput = useDebounce(inputValue, 500)
     const API_KEY = import.meta.env.VITE_VIETMAP_API_KEY
 
     // ==================== 1. AUTOCOMPLETE ====================
