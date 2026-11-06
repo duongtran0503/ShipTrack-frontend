@@ -11,7 +11,19 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import type { ColumnDef, Row } from "@tanstack/react-table"
-import { Ban, CheckCircle2, Clock, Eye, MapPin, Trash2, Truck, type LucideIcon } from "lucide-react"
+import {
+    AlertTriangle,
+    Ban,
+    CheckCircle2,
+    Clock,
+    Eye,
+    MapPin,
+    PackageCheck,
+    Trash2,
+    Truck,
+    UserCheck,
+    type LucideIcon
+} from "lucide-react"
 import type { CustomerOrderType } from "./type"
 
 interface ActionCellProps {
@@ -59,10 +71,10 @@ export const ActionCell = ({ row, onView, onCancel }: ActionCellProps) => {
 
 const STATUS_CONFIG: Record<
     CustomerOrderType["status"],
-    { label: string; className: string; icon: unknown }
+    { label: string; className: string; icon: LucideIcon }
 > = {
     PENDING: {
-        label: "Chờ xử lý",
+        label: "Chờ xác nhận",
         className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
         icon: Clock,
     },
@@ -70,6 +82,16 @@ const STATUS_CONFIG: Record<
         label: "Đang tìm tài xế",
         className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
         icon: Clock,
+    },
+    DRIVER_ASSIGNED: {
+        label: "Tài xế đã nhận đơn",
+        className: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
+        icon: UserCheck,
+    },
+    PICKED_UP: {
+        label: "Đã lấy hàng",
+        className: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+        icon: PackageCheck,
     },
     DELIVERING: {
         label: "Đang giao hàng",
@@ -85,6 +107,11 @@ const STATUS_CONFIG: Record<
         label: "Đã hủy",
         className: "bg-destructive/10 text-destructive border-destructive/20",
         icon: Ban,
+    },
+    FAILED: {
+        label: "Giao thất bại",
+        className: "bg-rose-500/10 text-rose-600 border-rose-500/20",
+        icon: AlertTriangle,
     },
 }
 
@@ -159,7 +186,7 @@ export const getOrderColumns = (
                 <DataTableColumnHeader column={column} title="Cước phí" />
             ),
             cell: ({ row }) => {
-                const fee: number = row.getValue("shippingFee")
+                const fee: number = row.getValue("shippingFee") || 0
                 return (
                     <div className="font-bold text-shiptrack-price text-xs">
                         {fee.toLocaleString("vi-VN")} đ
@@ -174,8 +201,12 @@ export const getOrderColumns = (
             ),
             cell: ({ row }) => {
                 const status: CustomerOrderType["status"] = row.getValue("status")
-                const config = STATUS_CONFIG[status] || STATUS_CONFIG.PENDING
-                const Icon = config.icon as LucideIcon
+                const config = STATUS_CONFIG[status] || {
+                    label: status,
+                    className: "bg-muted text-muted-foreground border-border",
+                    icon: Clock,
+                }
+                const Icon = config.icon
 
                 return (
                     <Badge

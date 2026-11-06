@@ -39,7 +39,7 @@ export function useAvailableOrders() {
             const raw = response.data.data || response.data;
             return raw as { isOnline: boolean;[key: string]: any };
         },
-        staleTime: 10000,
+        staleTime: 1000,
     });
 
     const isOnline = Boolean(statusResponse?.isOnline);
@@ -55,6 +55,7 @@ export function useAvailableOrders() {
         // Đảm bảo chỉ bật khi API status đã load xong VÀ isOnline thực sự là true
         enabled: isStatusLoaded && isOnline === true,
         refetchInterval: isOnline ? 5000 : false,
+        staleTime: 0,
     });
 
     // 3. Mutation Nhận đơn hàng

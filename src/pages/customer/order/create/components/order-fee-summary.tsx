@@ -1,5 +1,4 @@
-
-import { Calculator, Clock, Loader2, MapPin, ShieldCheck, Weight } from "lucide-react"
+import { Calculator, Clock, Loader2, MapPin, PackageCheck, ShieldCheck, Timer, Weight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,30 +30,29 @@ export function OrderFeeSummary({
             <CardHeader className="pb-3 border-b border-border/60">
                 <CardTitle className="text-base font-bold flex items-center gap-2">
                     <Calculator className="size-5 text-primary" />
-                    <span>Chi tiết cước phí</span>
+                    <span>Chi tiết cước phí & Lộ trình</span>
                 </CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-5 pt-4">
                 {isCalculating ? (
-                    /* 👇 Trạng thái đang tính toán (Gọi Vietmap Routing) */
                     <div className="flex flex-col items-center justify-center py-10 space-y-4">
                         <div className="p-4 rounded-full bg-primary/10">
                             <Loader2 className="size-8 animate-spin text-primary" />
                         </div>
                         <div className="text-center space-y-1">
                             <p className="text-sm font-bold text-foreground">Đang tính toán lộ trình...</p>
-                            <p className="text-xs text-muted-foreground">Hệ thống đang tìm tuyến đường tối ưu nhất</p>
+                            <p className="text-xs text-muted-foreground">Vietmap đang tối ưu hóa tuyến đường</p>
                         </div>
                     </div>
                 ) : (
-                    /* 👇 Trạng thái bình thường: Hiển thị thông số */
                     <>
-                        {/* Thông số */}
+                        {/* Thông số chi tiết */}
                         <div className="space-y-3 text-xs">
+                            {/* Khoảng cách Vietmap */}
                             <div className="flex items-center justify-between py-1.5 border-b border-border/40">
                                 <span className="text-muted-foreground flex items-center gap-1.5">
-                                    <MapPin className="size-3.5 text-primary" /> Khoảng cách ước tính
+                                    <MapPin className="size-3.5 text-primary" /> Khoảng cách (Vietmap)
                                 </span>
                                 <span className="font-bold text-foreground">
                                     {calculationResult.distanceKm > 0
@@ -63,18 +61,40 @@ export function OrderFeeSummary({
                                 </span>
                             </div>
 
+                            {/* Thời gian di chuyển Vietmap */}
                             <div className="flex items-center justify-between py-1.5 border-b border-border/40">
                                 <span className="text-muted-foreground flex items-center gap-1.5">
-                                    <Clock className="size-3.5 text-blue-500" /> Thời gian giao dự kiến
+                                    <Timer className="size-3.5 text-blue-500" /> TG di chuyển (Vietmap)
                                 </span>
-                                <span className="font-bold text-foreground">
+                                <span className="font-semibold text-foreground">
+                                    ~ {calculationResult.vietmapMinutes || 0} phút
+                                </span>
+                            </div>
+
+                            {/* Thời gian xử lý / bốc xếp */}
+                            <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                                <span className="text-muted-foreground flex items-center gap-1.5">
+                                    <PackageCheck className="size-3.5 text-amber-500" /> TG xử lý & bốc xếp
+                                </span>
+                                <span className="font-semibold text-foreground">
+                                    ~ {calculationResult.processingMinutes || 0} phút
+                                </span>
+                            </div>
+
+                            {/* Tổng thời gian giao dự kiến */}
+                            <div className="flex items-center justify-between py-1.5 border-b border-border/40 bg-muted/30 px-2 rounded-lg">
+                                <span className="text-foreground font-bold flex items-center gap-1.5">
+                                    <Clock className="size-3.5 text-emerald-600" /> Tổng TG giao dự kiến
+                                </span>
+                                <span className="font-black text-primary text-sm">
                                     {formatDeliveryTime(calculationResult.estimatedMinutes)}
                                 </span>
                             </div>
 
+                            {/* Khối lượng */}
                             <div className="flex items-center justify-between py-1.5 border-b border-border/40">
                                 <span className="text-muted-foreground flex items-center gap-1.5">
-                                    <Weight className="size-3.5 text-emerald-500" /> Khối lượng
+                                    <Weight className="size-3.5 text-emerald-500" /> Khối lượng hàng
                                 </span>
                                 <span className="font-bold text-foreground">
                                     {weight || 1} kg

@@ -13,7 +13,7 @@ export default function CreateOrderPage() {
         // Data cho tính phí
         weightWatch,
         calculationResult,
-        isCalculating, // 👈 Lấy từ hook
+        isCalculating, // 
 
         // Actions
         goBack,
