@@ -10,19 +10,33 @@ export default function ButtonLogout() {
 
     const handleLogout = async () => {
         try {
-            // 2. Dừng kết nối SignalR trước khi xóa token và chuyển trang
+            // 1. Dừng kết nối SignalR của tab hiện tại trước khi xóa token
             await stopSignalRConnection();
         } catch (error) {
             console.error("Lỗi khi dừng SignalR:", error);
         }
 
-        // 3. Xóa toàn bộ thông tin xác thực lưu trong Storage
+        // 2. Lấy active email của tab hiện tại để xóa chính xác dữ liệu phiên làm việc này
+        const activeEmail = sessionStorage.getItem("shiptrack_active_email");
+
+        if (activeEmail) {
+            sessionStorage.removeItem(`accessToken_${activeEmail}`);
+            sessionStorage.removeItem(`refreshToken_${activeEmail}`);
+            sessionStorage.removeItem(`role_${activeEmail}`);
+            sessionStorage.removeItem(`shiptrack_current_user_${activeEmail}`);
+        }
+        sessionStorage.removeItem("shiptrack_active_email");
+
+        // 3. Dọn dẹp sạch cả các key legacy cũ (cả session lẫn local nếu có)
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('accessToken');
         localStorage.removeItem('token');
-        localStorage.removeItem('accessToken'); // Nếu bạn lưu với key này
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('shiptrack_active_email');
 
         toast.success("Đăng xuất thành công!");
 
-        // 4. Điều hướng về trang login
+        // 4. Điều hướng về trang login của tab này
         navigate('/login', { replace: true });
     };
 

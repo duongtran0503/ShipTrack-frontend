@@ -1,42 +1,19 @@
-import { useLayoutEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { toast } from "sonner";
 
 export function PrivateRouteWrapper() {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    // Kiểm tra trực tiếp ngay lập tức trong sessionStorage của tab hiện tại mà không dùng useState(null)
+    const activeEmail = sessionStorage.getItem("shiptrack_active_email");
+    const sessionToken = activeEmail ? sessionStorage.getItem(`accessToken_${activeEmail}`) : null;
 
-    useLayoutEffect(() => {
-        // -------------------------------------------------------------
-        // LOGIC CHECK TOKEN:
-        // Tạm thời để true để xây dựng giao diện trước.
-        // Sau này thay bằng: const token = localStorage.getItem("accessToken");
-        // -------------------------------------------------------------
-        const checkAuthToken = () => {
-            const mockTokenValid = localStorage.getItem("token");
+    const isAuthenticated = Boolean(sessionToken);
 
-            if (mockTokenValid) {
-                setIsAuthenticated(true);
-            } else {
-                setIsAuthenticated(true);
-            }
-        };
-
-        checkAuthToken();
-    }, []);
-
-    // Trong lúc chờ useLayoutEffect check token (nếu có async/sync nhanh)
-    if (isAuthenticated === null) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-slate-100">
-                <p className="animate-pulse text-sm">Đang kiểm tra quyền truy cập...</p>
-            </div>
-        );
-    }
-
-    // Nếu đã xác thực -> Cho phép truy cập các Route con qua <Outlet />
-    // Nếu chưa xác thực -> Chuyển hướng sang trang Login
+    // Nếu chưa đăng nhập, hiển thị thông báo và chuyển hướng
     if (!isAuthenticated) {
-        toast.error("Vui lòng đăng nhập để sử dụng")
+        // Dùng setTimeout nhỏ hoặc kiểm tra để tránh gọi toast nhiều lần nếu cần, 
+        // nhưng với return <Navigate> thì chỉ chạy 1 lần.
+        return <Navigate to="/login" replace />;
     }
-    return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+
+    // Đã đăng nhập -> Cho phép qua trực tiếp <Outlet />
+    return <Outlet />;
 }

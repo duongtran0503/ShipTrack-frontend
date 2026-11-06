@@ -9,10 +9,7 @@ import { loginSchema, type LoginShemaType } from "@/lib/schemas/auth/login";
 import { authApi } from "@/services/auth/auth-api";
 import type { LoginResponse } from "@/services/auth/type";
 
-const TOKEN_STORAGE_KEY = "accessToken";
-const REFRESH_TOKEN_STORAGE_KEY = "refreshToken";
-const USER_ROLE_STORAGE_KEY = "role";
-const CURRENT_USER_STORAGE_KEY = "shiptrack_current_user";
+const ACTIVE_USER_EMAIL_KEY = "shiptrack_active_email";
 
 export const useLoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -30,16 +27,20 @@ export const useLoginForm = () => {
         },
     });
 
-    // Thay thế mockApi bằng authApi.login thật
     const loginMutation = useMutation({
         mutationFn: (credentials: LoginShemaType) => authApi.login(credentials),
-        onSuccess: (data: LoginResponse) => {
-            // 1. Lưu token và thông tin người dùng vào localStorage từ response của API thực tế
-            localStorage.setItem(TOKEN_STORAGE_KEY, data.access_token);
-            localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, data.refresh_token);
-            localStorage.setItem(USER_ROLE_STORAGE_KEY, data.role);
-            localStorage.setItem(
-                CURRENT_USER_STORAGE_KEY,
+        onSuccess: (data: LoginResponse, credentials) => {
+            const emailKey = (data.email || credentials.email).toLowerCase().trim();
+
+            // 1. Đặt tài khoản này làm active hiện tại riêng cho Tab này (dùng sessionStorage)
+            sessionStorage.setItem(ACTIVE_USER_EMAIL_KEY, emailKey);
+
+            // 2. Lưu độc lập theo namespaced key vào sessionStorage của Tab hiện tại
+            sessionStorage.setItem(`accessToken_${emailKey}`, data.access_token);
+            sessionStorage.setItem(`refreshToken_${emailKey}`, data.refresh_token);
+            sessionStorage.setItem(`role_${emailKey}`, data.role);
+            sessionStorage.setItem(
+                `shiptrack_current_user_${emailKey}`,
                 JSON.stringify({
                     id: String(data.user_id),
                     fullName: data.name,
@@ -50,10 +51,10 @@ export const useLoginForm = () => {
                 })
             );
 
-
             toast.success(`Đăng nhập thành công! Chào mừng ${data.name}`);
-            const checkRole = data.role.toUpperCase()
-            // 2. Điều hướng dựa theo role trả về từ backend thực tế
+            const checkRole = data.role.toUpperCase();
+
+            // 3. Điều hướng dựa theo role
             if (checkRole === "ADMIN") {
                 navigate("/manager/dashboard");
             } else if (["DRIVER_EXPRESS", "DRIVER_TRUCK", "DRIVER_CONTAINER"].includes(checkRole)) {
@@ -63,9 +64,8 @@ export const useLoginForm = () => {
             }
         },
         onError: (error: any) => {
-            console.log("ldskjflwsadkfj", error)
-            const errorMessage = error.message ||
-                "Đăng nhập thất bại. Vui lòng kiểm tra lại!";
+            console.log("Login error:", error);
+            const errorMessage = error?.response?.data?.message || error?.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại!";
             toast.error(errorMessage);
         },
     });

@@ -9,12 +9,21 @@ const apiClient = axios.create({
         'Content-Type': 'application/json',
     },
 });
-
+/**
+ * 💡 Lấy Access Token từ sessionStorage của riêng Tab hiện tại (Hỗ trợ đa tài khoản đa tab)
+ */
+export const getActiveAccessToken = () => {
+    const activeEmail = sessionStorage.getItem("shiptrack_active_email");
+    if (activeEmail) {
+        return sessionStorage.getItem(`accessToken_${activeEmail}`);
+    }
+    return null;
+};
 // ==================== REQUEST INTERCEPTOR ====================
 // Tự động kiểm tra và gắn accessToken vào header trước khi gửi request
 apiClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("accessToken");
+        const token = getActiveAccessToken()
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -48,3 +57,4 @@ apiClient.interceptors.response.use(
 );
 
 export { apiClient };
+
