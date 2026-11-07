@@ -41,14 +41,14 @@ export default function VehicleReplacePage() {
 
             {/* Cảnh báo thay xe */}
             <ReplaceWarning
-                vehicleTypeLabel={vehicle.vehicleTypeLabel}
+                vehicleTypeLabel={vehicle.vehicleType}
                 oldLicensePlate={vehicle.licensePlate}
             />
 
             <Card className="rounded-[28px] border-border/60 shadow-sm bg-card">
                 <CardContent className="p-6 sm:p-8 space-y-6">
                     {/* Khối thông tin loại xe cố định */}
-                    <ReplaceReadonlyInfo vehicleTypeLabel={vehicle.vehicleTypeLabel} />
+                    <ReplaceReadonlyInfo vehicleTypeLabel={vehicle.vehicleType} />
 
                     {/* Form nhập liệu */}
                     <ReplaceForm

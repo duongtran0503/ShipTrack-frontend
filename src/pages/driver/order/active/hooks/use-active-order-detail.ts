@@ -127,7 +127,7 @@ export function useActiveOrderDetail() {
             }
             return res.data.data || res.data;
         },
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {
             toast.success(`Cập nhật trạng thái thành công: "${variables.nextLabel}"`);
             queryClient.invalidateQueries({ queryKey: ["driver_active_orders"] });
             queryClient.invalidateQueries({ queryKey: ["driver_active_order_detail", id] });

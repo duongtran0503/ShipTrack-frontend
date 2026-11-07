@@ -73,7 +73,7 @@ export const getDriverColumns = (
                     </Badge>
                 );
             },
-            filterFn: (row, id, value: string[]) => {
+            filterFn: (row, _id, value: string[]) => {
                 const driver = row.original;
                 if (value.includes("ALL")) return true;
                 if (value.includes("ONLINE") && driver.IsActive && driver.DeliveryStatus === "ONLINE") return true;

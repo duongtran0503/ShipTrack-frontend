@@ -1,4 +1,3 @@
-// src/lib/hooks/use-vietmap.ts
 import { useEffect, useState } from "react";
 import { useDebounce } from "./use-debounce"; // Đảm bảo đúng đường dẫn tới hook debounce của bạn
 
@@ -67,6 +66,7 @@ export function useVietmap(inputValue: string = "", userLocation?: LatLng) {
         }
 
         fetchPlaces()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedInput, userLocation?.lat, userLocation?.lng, API_KEY])
 
     // ==================== 2. GET PLACE DETAIL ====================

@@ -54,19 +54,7 @@ export function RegisterForm({ form, onSubmit, isSubmitting, onCancel }: Props) 
                             )}
                         </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                                Model / Dòng xe <span className="text-destructive">*</span>
-                            </Label>
-                            <Input
-                                {...register("model")}
-                                placeholder="Ví dụ: Wave Alpha, Vios..."
-                                className="h-11 rounded-xl text-xs bg-muted/40 font-semibold"
-                            />
-                            {errors.model && (
-                                <span className="text-[11px] text-destructive font-semibold">{errors.model.message}</span>
-                            )}
-                        </div>
+
 
                         <div className="space-y-2">
                             <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
@@ -88,12 +76,12 @@ export function RegisterForm({ form, onSubmit, isSubmitting, onCancel }: Props) 
                             </Label>
                             <Input
                                 type="number"
-                                {...register("weightCapacityKg", { valueAsNumber: true })}
+                                {...register("maxWeightKg", { valueAsNumber: true })}
                                 placeholder="Ví dụ: 50"
                                 className="h-11 rounded-xl text-xs bg-muted/40 font-semibold"
                             />
-                            {errors.weightCapacityKg && (
-                                <span className="text-[11px] text-destructive font-semibold">{errors.weightCapacityKg.message}</span>
+                            {errors.maxWeightKg && (
+                                <span className="text-[11px] text-destructive font-semibold">{errors.maxWeightKg.message}</span>
                             )}
                         </div>
                     </div>

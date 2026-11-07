@@ -47,20 +47,7 @@ export function ReplaceForm({ form, onSubmit, onCancel }: Props) {
                     )}
                 </div>
 
-                {/* Model mới */}
-                <div className="space-y-2">
-                    <Label className="text-xs font-bold text-foreground uppercase tracking-wider">
-                        Model mới <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                        placeholder="Ví dụ: Sirius, Exciter..."
-                        {...register("model")}
-                        className="h-11 rounded-xl text-xs bg-muted/40 font-semibold"
-                    />
-                    {errors.model && (
-                        <span className="text-[11px] text-destructive font-semibold">{errors.model.message}</span>
-                    )}
-                </div>
+
 
                 {/* Màu xe */}
                 <div className="space-y-2">

@@ -1,4 +1,4 @@
-import type { CustomerAddress } from "@/demo_data_services/mockAddressService"
+import type { CustomerAddress } from "@/services/user/type"
 import { AddressCard } from "./address-card"
 import { AddressEmptyState } from "./address-empty-state"
 

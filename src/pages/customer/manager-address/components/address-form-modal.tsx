@@ -4,9 +4,9 @@ import { Controller, type UseFormReturn } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import type { CustomerAddress } from "@/demo_data_services/mockAddressService"
 import type { AddressSchemaType } from "@/lib/schemas/address"
 import { AddressSearchInput } from "@/pages/customer/order/create/components/address-search-input"
+import type { CustomerAddress } from "@/services/user/type"
 
 const LABEL_PRESETS = ["Nhà riêng", "Công ty", "Kho hàng"]
 

@@ -1,9 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bell } from "lucide-react";
-import type { Notification } from "../types";
 
+export interface notificationType {
+    title: string;
+    time: string;
+    message?: string;
+    content?: string
+}
 interface Props {
-    notifications: Notification[];
+    notifications: notificationType[];
 }
 
 export function NotificationsCard({ notifications }: Props) {

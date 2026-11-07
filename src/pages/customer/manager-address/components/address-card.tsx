@@ -8,7 +8,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { CustomerAddress } from "@/demo_data_services/mockAddressService"
+import type { CustomerAddress } from "@/services/user/type"
 
 interface Props {
     address: CustomerAddress
@@ -96,7 +96,7 @@ export function AddressCard({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onDelete(address.id)}
+                        onClick={() => onDelete(address.id + "")}
                         className="size-8 p-0 rounded-xl hover:bg-destructive/10 hover:text-destructive"
                     >
                         <Trash2 className="size-3.5" />

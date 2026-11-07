@@ -151,7 +151,7 @@ export const mockAuthService = {
     },
 
     // Mock Đặt lại mật khẩu mới
-    resetPassword: async (password: string, token: string): Promise<{ message: string }> => {
+    resetPassword: async (_password: string, token: string): Promise<{ message: string }> => {
         await new Promise((resolve) => setTimeout(resolve, 800));
 
         const savedToken = localStorage.getItem("shiptrack_reset_token");
